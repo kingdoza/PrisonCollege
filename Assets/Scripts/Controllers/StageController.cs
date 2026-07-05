@@ -162,7 +162,7 @@ public class StageController : SceneSingleton<StageController>
 
     private void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) && _isPreparing))
+        if (_isPreparing && Input.GetKeyDown(KeyCode.Tab))
         {
             InitStage();
         }
