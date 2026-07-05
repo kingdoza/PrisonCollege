@@ -6,7 +6,13 @@
 
 이 프로젝트는 Unity 6000.2.6f2 기반의 1인칭 스테이지 진행형 게임이다. 플레이어는 교수 역할로 스테이지 안의 대학원생을 통제하고, 제한 시간 동안 프로젝트 진행도를 채우는 구조다.
 
-핵심 코드는 대부분 `Assets/Scripts` 아래에 있으며, 별도 커스텀 asmdef 없이 `Assembly-CSharp`에 함께 컴파일된다. `Assets/Scripts/_GameJam`과 `Assets/Scripts/_deprecated`는 이전 버전 또는 폐기된 코드로 보이며, 현재 본편 흐름은 `Systems`, `Controllers`, `Weapons`, `BehaviourTree`, `SO`, `UIs` 중심이다.
+핵심 코드는 대부분 `Assets/Scripts` 아래에 있으며, 별도 커스텀 asmdef 없이 `Assembly-CSharp`에 함께 컴파일된다. `Assets/Scripts/_GameJam`과 `Assets/Scripts/_deprecated`는 현재 본편 프로젝트에서 사용하지 않는 레거시 또는 폐기 코드로 취급하며, 현재 본편 흐름은 `Systems`, `Controllers`, `Weapons`, `BehaviourTree`, `SO`, `UIs` 중심이다.
+
+## 레거시/미사용 코드 범위
+
+`Assets/Scripts/_GameJam` 아래 코드는 현재 프로젝트의 본편 런타임 흐름에서 사용하지 않는다. 해당 폴더에는 게임잼 프로토타입 시절의 `GameSystem`, `Player`, `Student`, `ChaosSystem`, `HUDController`, `Spot` 계열 코드가 남아 있으나, 현재 구조 분석과 기능 수정 대상에서는 제외한다.
+
+다만 별도 asmdef 또는 컴파일 제외 설정이 없기 때문에 Unity의 `Assembly-CSharp`에는 함께 컴파일될 수 있다. 따라서 미사용 코드라도 문법 오류나 타입 충돌이 생기면 프로젝트 컴파일에 영향을 줄 수 있다.
 
 ## 상위 실행 흐름
 
@@ -719,4 +725,3 @@ ScriptableObjects
     -> AttributeSystem modifier 변경
       -> 이동/공격/AI/작업/상호작용 속도에 반영
 ```
-
