@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac4f4c0196682646a587c4c7d08bd23, type: 3}
+  m_Name: 3_TalmoBeam
+  m_EditorClassIdentifier: Assembly-CSharp::StudBaldHead
+  id: 0
+  name: "\uD0C8\uBAA8\uBE54"
+  icon: {fileID: 21300000, guid: 224df99b442fa204896d3611cef3d304, type: 3}
+  price: 250
+  effect: "<color=#80FF80>- \uC804\uB4F1\uC774 \uCF1C\uC838 \uC788\uC744 \uB54C,
+    \uBCBD \uB108\uBA38\uC758 \n\uB300\uD559\uC6D0\uC0DD\uC758 \uC704\uCE58\uB97C
+    \uD45C\uC2DC -"
+  description: "\uBBFC\uBA38\uB9AC, \uB300\uBA38\uB9AC, \uB9E8\uB4E4\uB9E8\uB4E4
+    \uBE61\uBE61\uC774"
+  rarity: 0
+  isBald: 1
+  isOutline: 1

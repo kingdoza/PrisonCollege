@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3b5aa7eecad822438ea1ab5aadbfc9f, type: 3}
+  m_Name: 7_SecureWall
+  m_EditorClassIdentifier: Assembly-CSharp::HackRepairFaster
+  id: 100
+  name: "\uC2DC\uC2A4\uD15C \uBC29\uD654\uBCBD"
+  icon: {fileID: 21300000, guid: f737d6b5dd1beac4fb43dbac838ff0b9, type: 3}
+  price: 100
+  effect: "<color=#80FF80>- 80% \uD655\uB960\uB85C \uD574\uD0B9 \uBC29\uC5B4 -"
+  description: "\u201C\uAE30\uCD08\uC801\uC778 \uC784\uD50C\uB780\uD2B8\u201D"
+  rarity: 0
+  hackDefenseFlat: 0.8

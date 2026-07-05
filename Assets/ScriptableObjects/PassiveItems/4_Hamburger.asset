@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc95a6937fdc76345bcdb113b809a7d2, type: 3}
+  m_Name: 4_Hamburger
+  m_EditorClassIdentifier: Assembly-CSharp::StudFood
+  id: 0
+  name: "\uACE0\uC9C0\uBC29 \uD584\uBC84\uAC70"
+  icon: {fileID: 21300000, guid: 1e8d0aec2cc0040478630e0dce73b0f9, type: 3}
+  price: 350
+  effect: "<color=#80FF80>- \uB300\uD559\uC6D0\uC0DD \uC774\uB3D9\uC18D\uB3C4 -20%
+    -"
+  description: "\uBE44\uB9CC\uC740 \uAC10\uAE08\uD558\uAE30 \uC88B\uC740 \uC870\uAC74
+    \uC911 \uD558\uB098\uC785\uB2C8\uB2E4."
+  rarity: 0
+  studMoveSpeedPercent: -0.2
+  studStomachScale: 0.5
+  isDeskFood: 1

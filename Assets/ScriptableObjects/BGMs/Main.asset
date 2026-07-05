@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72841a2f0347b8840a397c2a6ac8073c, type: 3}
+  m_Name: Main
+  m_EditorClassIdentifier: Assembly-CSharp::BGMPlaylistData
+  bgmList:
+  - bgmTitle: 
+    clip: {fileID: 8300000, guid: 5c79d6680d2363944995b2d85b4a085d, type: 3}
+    volumeMultiplier: 1
+  - bgmTitle: 
+    clip: {fileID: 8300000, guid: d3c679222ec02fd4498a2c34133e31a7, type: 3}
+    volumeMultiplier: 0.55
+  - bgmTitle: 
+    clip: {fileID: 8300000, guid: ae186f0840719dc429aeef22fdcbdf41, type: 3}
+    volumeMultiplier: 0.28
+  baseVolume: 0.3

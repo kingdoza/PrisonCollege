@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 834e2717f58b7ec45811321098ff2935, type: 3}
+  m_Name: 14_VitamineJelly
+  m_EditorClassIdentifier: Assembly-CSharp::VitaminJelly
+  id: 0
+  name: "\uBE44\uD0C0444 \uC824\uB9AC"
+  icon: {fileID: 21300000, guid: 3ea7d45dec3d4d849a1a08fa73cac3d5, type: 3}
+  price: 50
+  effect: "<color=#80FF80>- \uCCB4\uB825 \uD68C\uBCF5 \uB51C\uB808\uC774 -67% -"
+  description: "\uAD50\uC218\uB2D8\uC758 \uD53C\uB85C\uB97C \uB35C\uC5B4\uB4DC\uB9AC\uAE30\uC5D0
+    \uC544\uC8FC \uC88B\uC740 \uC74C\uC2DD\uC785\uB2C8\uB2E4."
+  rarity: 0
+  healDelayPercent: 2

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c89ac851118d54499ccb8c43e4e9f39, type: 3}
+  m_Name: 12_Shackle
+  m_EditorClassIdentifier: Assembly-CSharp::Shackle
+  id: 0
+  name: "\uC871\uC1C4"
+  icon: {fileID: 21300000, guid: bed12232ed1b62844be05ca4526e3040, type: 3}
+  price: 80
+  effect: "<color=#80FF80>- \uB300\uD559\uC6D0\uC0DD \uC774\uB3D9\uC18D\uB3C4 -20%
+    -\r\n<color=#FFA0A0>- \uB300\uD559\uC6D0\uC0DD \uACF5\uACA9\uB825 +30% -"
+  description: "\uC8C4\uC218\uB4E4\uC744 \uAC10\uAE08\uD558\uAE30 \uC704\uD55C \uCD5C\uACE0\uC758
+    \uBB3C\uD488\uC785\uB2C8\uB2E4. \uB2E4\uB9CC \uD559\uC0DD\uB4E4\uC774 \uBB34\uAC8C\uB97C
+    \uC774\uC6A9\uD574 \uACF5\uACA9\uD558\uB294 \uBC95\uC744 \uBC30\uC6B4 \uAC83
+    \uAC19\uC2B5\uB2C8\uB2E4."
+  rarity: 0
+  studMoveSpeedPercent: -0.2
+  studDamagePercent: 0.3
+  isTiedShackle: 1

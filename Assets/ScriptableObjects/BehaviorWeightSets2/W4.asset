@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c861b26cff1254c9f115b9c65d06bc, type: 3}
+  m_Name: W4
+  m_EditorClassIdentifier: 
+  _weightedElements:
+  - _behaviorType: 1
+    _chance: 0
+  - _behaviorType: 2
+    _chance: 7
+  - _behaviorType: 4
+    _chance: 10
+  - _behaviorType: 8
+    _chance: 50
+  - _behaviorType: 16
+    _chance: 10
+  - _behaviorType: 32
+    _chance: 10
+  - _behaviorType: 64
+    _chance: 15
+  - _behaviorType: 128
+    _chance: 8
+  - _behaviorType: 256
+    _chance: 15
+  - _behaviorType: 512
+    _chance: 6
+  - _behaviorType: 1024
+    _chance: 5
+  - _behaviorType: 2048
+    _chance: 6
+  - _behaviorType: 4096
+    _chance: 6
+  - _behaviorType: 8192
+    _chance: 6
+  - _behaviorType: 32768
+    _chance: 6
+  - _behaviorType: 65536
+    _chance: 6
+  - _behaviorType: 131072
+    _chance: 10

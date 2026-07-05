@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a062497ac069cf94a8a57a5a0d1d7610, type: 3}
+  m_Name: 3_MarkerPen
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponItem
+  id: 0
+  name: "\uB9C8\uCEE4\uD39C"
+  icon: {fileID: 21300000, guid: 77993de3854843547b5e36661ddb6357, type: 3}
+  price: 50
+  effect: "\uACF5\uACA9\uB825 30\r\n\uACF5\uACA9\uC18D\uB3C4 0.5s\r\n\uC2A4\uD0DC\uBBF8\uB098
+    \uC18C\uBAA8 5"
+  description: "[\uD22C\uCC99\uBB34\uAE30]\r\n\uC7A0\uC744 \uAE68\uC6B8\uB54C \uB358\uC9C0\uAE30
+    \uC88B\uC740 \uD559\uC6A9\uD488\uC785\uB2C8\uB2E4."
+  rarity: 0
+  inStageIndex: 2

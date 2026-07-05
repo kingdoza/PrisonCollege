@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15ac02b2d91103f429763d610ea44360, type: 3}
+  m_Name: 1_Shoe
+  m_EditorClassIdentifier: Assembly-CSharp::Shoe
+  id: 0
+  name: "\uC2A4\uB2C8\uCEE4\uC988"
+  icon: {fileID: 21300000, guid: 48b9b8d18edefb14aa8cde33c2c6f7ca, type: 3}
+  price: 250
+  effect: "<color=#80FF80>- \uAD50\uC218 \uC774\uB3D9\uC18D\uB3C4 +20% -</color>"
+  description: "\uC61B\uB0A0 \uB0A9\uCE58\uBC94\uB4E4\uC774 \uBAB0\uB798 \uB0A9\uCE58\uD574\uAC00\uAE30
+    \uC704\uD574, \uC2A4\uB2C8\uCEE4\uC988\uB97C \uB9CE\uC774 \uC2E0\uC5C8\uB2E4\uACE0
+    \uD569\uB2C8\uB2E4."
+  rarity: 0
+  profMoveSpeedPercent: 0.2

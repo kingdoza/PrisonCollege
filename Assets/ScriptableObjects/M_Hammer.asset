@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ebb49a6d408a7b40b5b06bdc2bf4d8a, type: 3}
+  m_Name: M_Hammer
+  m_EditorClassIdentifier: 
+  animLength: 2
+  staminaCost: 20
+  hitImpulse: 600
+  dodgeProb: 0
+  effect: {fileID: 11400000, guid: 481ceed07dad93547b745ac35d45c989, type: 2}
