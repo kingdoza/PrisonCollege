@@ -705,6 +705,10 @@ public class PostStudent : MonoBehaviour
     {
         _blackboard.isDamaged = true;
         _blackboard.isStunned = true;
+        if (hitAmount > 0f && _player != null && hitInfo.attacker == _player.gameObject && !_damageReceiver.Health.IsDepleted)
+        {
+            HitMarkerUI.Instance?.PlayHit();
+        }
         //PlayScene3DSFX(_bodyHitSD, hitInfo.hitPoint);
     }
 

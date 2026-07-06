@@ -347,6 +347,7 @@ public class StageController : SceneSingleton<StageController>
     {
         if (hitInfo.attacker == Player.gameObject)
         {
+            HitMarkerUI.Instance?.PlayKill();
             KillFeedbackController.Instance.PlayKillFeedback();
         }
         if (student.IsDoingHazardBehavior == false && hitInfo.attacker == Player.gameObject)
