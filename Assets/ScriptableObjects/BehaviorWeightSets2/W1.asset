@@ -30,7 +30,7 @@ MonoBehaviour:
   - _behaviorType: 128
     _chance: 10
   - _behaviorType: 256
-    _chance: 0
+    _chance: 100
   - _behaviorType: 512
     _chance: 6
   - _behaviorType: 1024
