@@ -9,6 +9,7 @@ public class Microwave : MonoBehaviour
     [SerializeField] private Light _cookingLight;
     [SerializeField] private SoundData _humSD;
     [SerializeField] private SoundData _explosionSD;
+    [SerializeField] private LoopingVfxController _hazardCookingVfx;
     private ExplosionShacker _explosionShacker;
     private Click _interaction;
     private Duration _operateDuration;
@@ -37,6 +38,7 @@ public class Microwave : MonoBehaviour
         _interaction.InteractState = false;
         _interaction.ActionName = "À½½Ä »©±â";
         _interaction.FillAmount = 1f;
+        RefreshHazardCookingVfx();
     }
 
 
@@ -63,6 +65,7 @@ public class Microwave : MonoBehaviour
         //AttachProp(_currentFoodInside.gameObj, _foodSocket);
         _currentFoodInside.gameObj.SetActive(true);
         _interaction.InteractState = true;
+        RefreshHazardCookingVfx();
     }
 
 
@@ -74,6 +77,7 @@ public class Microwave : MonoBehaviour
         _emitter = SoundUtils.PlayOwnedScene3DSFX(_humSD, transform.position, false, 1, true);
         _operateDuration.Initialize(true);
         _cookingLight.enabled = true;
+        RefreshHazardCookingVfx();
     }
 
 
@@ -98,6 +102,7 @@ public class Microwave : MonoBehaviour
         _interaction.InteractState = false;
         _emitter?.StopAndReturn();
         _emitter = null;
+        RefreshHazardCookingVfx();
     }
 
 
@@ -110,6 +115,20 @@ public class Microwave : MonoBehaviour
         SoundUtils.PlayScene3DSFX(_explosionSD, transform.position);
         _fire.Ignite();
         Quit();
+    }
+
+
+
+    private void RefreshHazardCookingVfx()
+    {
+        if (_isOperating && _currentFoodInside != null && _currentFoodInside.isCauseFire)
+        {
+            _hazardCookingVfx?.Play();
+        }
+        else
+        {
+            _hazardCookingVfx?.Stop();
+        }
     }
 
 
