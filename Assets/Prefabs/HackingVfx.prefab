@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &496487244642044111
 Transform:
   m_ObjectHideFlags: 0
@@ -9902,7 +9902,7 @@ GameObject:
   - component: {fileID: 9027514048236820043}
   - component: {fileID: 9027514048236820044}
   m_Layer: 0
-  m_Name: CFXR Electrified 3
+  m_Name: HackingVfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
