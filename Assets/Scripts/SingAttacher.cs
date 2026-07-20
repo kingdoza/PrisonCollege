@@ -22,6 +22,8 @@ public class SingAttacher : AnimAttacher
     //public bool IsBad => _audioSource.clip != null && _audioSource.isPlaying && _audioSource.clip == _badSong.clip;
     public bool IsBad => _microphone.activeSelf && _isBadSongPlaying;
     private bool _isBadSongPlaying = false;
+    private bool _hasTutorialQualityOverride;
+    private bool _tutorialUseBadSong;
 
 
 
@@ -52,7 +54,8 @@ public class SingAttacher : AnimAttacher
         _microphone.SetActive(true);
 
         float randValue = UnityEngine.Random.Range(0f, 1f);
-        if (randValue < _badSongProbabiliy)
+        if ((_hasTutorialQualityOverride && _tutorialUseBadSong)
+            || (!_hasTutorialQualityOverride && randValue < _badSongProbabiliy))
         {
             _isBadSongPlaying = true;
             GetComponent<SoundBehavior>().PlayBadSong();
@@ -66,6 +69,21 @@ public class SingAttacher : AnimAttacher
         //_audioSource.time = randValue < _badSongProbabiliy ? _badSong.startTime : _targetGoodSong.startTime;
         //_audioSource.volume = randValue < _badSongProbabiliy ? _badSong.volumeRate : _targetGoodSong.volumeRate;
         //_audioSource.Play();
+    }
+
+
+
+    public void SetTutorialSongQuality(bool useBadSong)
+    {
+        _hasTutorialQualityOverride = true;
+        _tutorialUseBadSong = useBadSong;
+    }
+
+
+
+    public void ClearTutorialSongQuality()
+    {
+        _hasTutorialQualityOverride = false;
     }
 }
 

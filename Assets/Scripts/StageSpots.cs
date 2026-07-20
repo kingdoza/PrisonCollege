@@ -7,6 +7,9 @@ using static Utils;
 public class StageSpots : MonoBehaviour
 {
     [SerializeField] private Transform _spotParent;
+    [Header("Tutorial stable spot bindings")]
+    [Tooltip("정규 랜덤 spot 목록과 별개입니다. 튜토리얼 씬에서만 안정적인 ID를 직접 연결합니다.")]
+    [SerializeField] private TutorialSpotBinding[] _tutorialSpotBindings = System.Array.Empty<TutorialSpotBinding>();
     private List<BehaveSpot> _allBehaveSpots;
     private Dictionary<BehaviorType, List<BehaveSpot>> _behaveSpotsMap = new();
 
@@ -97,4 +100,33 @@ public class StageSpots : MonoBehaviour
         int randomIndex = Random.Range(0, availableSpots.Count);
         return availableSpots[randomIndex];
     }
+
+
+
+    public bool TryGetTutorialSpot(string stableId, out BehaveSpot spot)
+    {
+        if (_tutorialSpotBindings != null)
+        {
+            foreach (TutorialSpotBinding binding in _tutorialSpotBindings)
+            {
+                if (binding.stableId == stableId && binding.spot != null)
+                {
+                    spot = binding.spot;
+                    return true;
+                }
+            }
+        }
+
+        spot = null;
+        return false;
+    }
+}
+
+
+
+[System.Serializable]
+public struct TutorialSpotBinding
+{
+    public string stableId;
+    public BehaveSpot spot;
 }

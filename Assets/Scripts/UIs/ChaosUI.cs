@@ -44,4 +44,18 @@ public class ChaosUI : MonoBehaviour
         }
         SoundUtils.PlayUISFX(targetSD);
     }
+
+
+
+    public bool TryPlayHackSoundOnly()
+    {
+        if (_hackSD == null)
+        {
+            Debug.LogError("ChaosUI Hack SoundData가 연결되지 않아 정전음을 재생할 수 없습니다.", this);
+            return false;
+        }
+
+        SoundUtils.PlayUISFX(_hackSD);
+        return true;
+    }
 }

@@ -10,6 +10,9 @@ public class OutlineFader : MonoBehaviour
     private Color _originColor;
     private Color _transparentColor;
     private DG.Tweening.Sequence _fadeSequence;
+    private bool _hasExplicitRuntimeCommand;
+
+    public Outline TargetOutline => _outline != null ? _outline : GetComponent<Outline>();
 
     private void Awake()
     {
@@ -17,8 +20,7 @@ public class OutlineFader : MonoBehaviour
 
         // 원본 색상과 투명한 색상 설정
         //_originColor = _outline.OutlineColor;
-        _originColor = new Color(_outline.OutlineColor.r, _outline.OutlineColor.g, _outline.OutlineColor.b, 0.5f);
-        _transparentColor = new Color(_originColor.r, _originColor.g, _originColor.b, 0.1f);
+        ConfigureFadeColors(_outline.OutlineColor);
 
         // 스테이지 시작 시 페이드 중지 이벤트 연결
         if (StageController.Instance != null)
@@ -30,11 +32,39 @@ public class OutlineFader : MonoBehaviour
 
     private void Start()
     {
-        if (StageController.Instance.IsPreparing)
+        if (_hasExplicitRuntimeCommand) return;
+
+        if (StageController.Instance != null
+            && !StageController.Instance.IsTutorialRuntime
+            && StageController.Instance.IsPreparing)
             StartInfiniteFade();
-        else
+        else if (_outline != null)
             _outline.enabled = false;
     }
+
+    public bool StartFade(Color color)
+    {
+        if (_outline == null)
+            _outline = GetComponent<Outline>();
+        if (_outline == null)
+            return false;
+
+        _hasExplicitRuntimeCommand = true;
+        ConfigureFadeColors(color);
+        _outline.enabled = true;
+        StartInfiniteFade();
+        return true;
+    }
+
+
+
+    private void ConfigureFadeColors(Color color)
+    {
+        _originColor = new Color(color.r, color.g, color.b, 0.5f);
+        _transparentColor = new Color(color.r, color.g, color.b, 0.1f);
+    }
+
+
 
     private void StartInfiniteFade()
     {
@@ -57,8 +87,9 @@ public class OutlineFader : MonoBehaviour
             .SetLoops(-1); // 무한 반복
     }
 
-    private void StopFade()
+    public void StopFade()
     {
+        _hasExplicitRuntimeCommand = false;
         if (_fadeSequence != null)
         {
             _fadeSequence.Kill();

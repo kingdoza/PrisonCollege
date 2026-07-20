@@ -20,7 +20,9 @@ public class BoostReceiver : EffectReceiver
     {
         BoostData boostData = data as BoostData;
         if (boostData == null) return;
-        float workChance = boostTaskChanceMod.GetFinalValue(boostData.potency.workProbability);
+        float workChance = boostData.IgnorePassiveProbabilityModifiers
+            ? boostData.potency.workProbability
+            : boostTaskChanceMod.GetFinalValue(boostData.potency.workProbability);
         float frenzyChance = boostData.potency.frenzyProbability;
 
         float totalWeight = workChance + frenzyChance;

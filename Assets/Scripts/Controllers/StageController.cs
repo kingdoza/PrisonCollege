@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,9 @@ public class StageController : SceneSingleton<StageController>
 {
     [Header("Dev Only")]
     [SerializeField] private int _stageNumber = 0;
+    [Header("Runtime Config")]
+    [Tooltip("비어 있거나 Mode가 Normal이면 기존 정규 스테이지 경로를 그대로 사용합니다.")]
+    [SerializeField] private StageRuntimeConfig _runtimeConfig;
     [Header("UI Bindings")]
     [SerializeField] private TextMeshProUGUI _waveTmp;
     [SerializeField] private TextMeshProUGUI _timerTmp;
@@ -72,10 +76,42 @@ public class StageController : SceneSingleton<StageController>
     private int _workingStudCount = 0;
     private bool _isProfWorking = false;
     private List<PostStudent> _studentList = new();
+    private TutorialStagePolicy _tutorialPolicy;
+    private float _currentChaosRate;
+    private int _tutorialEscapeFailureThreshold = 3;
+    private int _tutorialEscapeCount;
+    private float _tutorialTimerRemaining;
+    private bool _tutorialTimerFinishedReported;
+    private int _projectCompletionId;
+    private bool _tutorialSimulationStopped;
 
     public float ProjectProgress => _projectStat.Ratio;
+    public float Chaos => _chaosStat.Current;
+    public float ChaosRate => _currentChaosRate;
+    public float TimerRemaining => IsTutorialRuntime ? _tutorialTimerRemaining : _timerStat.Current;
+    public int EscapeCount => IsTutorialRuntime ? _tutorialEscapeCount : Mathf.RoundToInt(_escapeStat.Current);
+    public int EscapeFailureThreshold => IsTutorialRuntime
+        ? _tutorialEscapeFailureThreshold
+        : Mathf.RoundToInt(_escapeStat.Max);
+    public int WorkingStudentCount => _workingStudCount;
+    public bool IsProfessorWorking => _isProfWorking;
+    public int SessionMoney => _money;
     public Professor Player => _player;
     public StageSpots StageSpots => _stageSpots;
+    public StageRuntimeConfig RuntimeConfig => _runtimeConfig;
+    public bool IsTutorialRuntime => _runtimeConfig != null && _runtimeConfig.IsTutorial;
+    public IReadOnlyList<PostStudent> Students => _studentList;
+
+    public event Action<ChaosChangedData> ChaosChanged;
+    public event Action<int, int> EscapeCountChanged;
+    public event Action<float, float> ProjectProgressChanged;
+    public event Action<int, ProjectContributor> ProjectCompleted;
+    public event Action<int> WorkingStudentCountChanged;
+    public event Action<PostStudent> StudentRegistered;
+    public event Action<PostStudent> StudentUnregistered;
+    public event Action<PostStudent, HitInfo, bool> StudentDowned;
+    public event Action<PostStudent> StudentEscaped;
+    public event Action<StageFinishResult> StageFinished;
 
     private AttributeModifier _studTaskModifier;
     private AttributeModifier _chaosDecreaseModifier;
@@ -100,15 +136,24 @@ public class StageController : SceneSingleton<StageController>
         _escapeStat.Initialize(true);
         _projectStat.Initialize(true);
 
-        _reflectionProbes = _reflectionGroup.GetComponentsInChildren<ReflectionProbe>();
+        _reflectionProbes = _reflectionGroup != null
+            ? _reflectionGroup.GetComponentsInChildren<ReflectionProbe>()
+            : Array.Empty<ReflectionProbe>();
 
-        _timerStat.DepletedEvent.AddListener(() => GameOver(true));
+        _timerStat.DepletedEvent.AddListener(OnTimerDepleted);
         _prepareTimeStat.DepletedEvent.AddListener(InitStage);
-        _escapeStat.MaxReachEvent.AddListener(() => GameOver(false));
+        _escapeStat.MaxReachEvent.AddListener(OnEscapeLimitReached);
         _projectStat.MaxReachEvent.AddListener(OnProjectSuccessed);
 
-        _originMoney =_money = InventorySystem.Instance.Money;
-        InventorySystem.Instance.ActivatePassiveItems();
+        if (!IsTutorialRuntime)
+        {
+            _originMoney =_money = InventorySystem.Instance.Money;
+            InventorySystem.Instance.ActivatePassiveItems();
+        }
+        else
+        {
+            _originMoney = _money = 0;
+        }
 
         //SetStudentList();
 
@@ -133,6 +178,11 @@ public class StageController : SceneSingleton<StageController>
     {
         int studentLayer = LayerMask.NameToLayer(Global.STUDENT_LAYER_NAME);
         Physics.IgnoreLayerCollision(studentLayer, studentLayer, true);
+        if (IsTutorialRuntime)
+        {
+            StartTutorialRuntime();
+            return;
+        }
         StartPrepare();
         RenderReflectionProbes();
         WaveSystem.Instance.ApplySkybox();
@@ -153,8 +203,7 @@ public class StageController : SceneSingleton<StageController>
 
         foreach (var student in _studentList)
         {
-            student.DieEvent.AddListener(OnStudentDied);
-            student.EscapeEvent.AddListener(OnStudentEscaped);
+            HookStudent(student, false);
         }
     }
 
@@ -162,6 +211,12 @@ public class StageController : SceneSingleton<StageController>
 
     private void Update()
     {
+        if (IsTutorialRuntime)
+        {
+            UpdateTutorialRuntime();
+            return;
+        }
+
         if (_isPreparing && Input.GetKeyDown(KeyCode.Tab))
         {
             InitStage();
@@ -187,6 +242,42 @@ public class StageController : SceneSingleton<StageController>
         {
             _remainedChaosDecreaseTime -= Time.deltaTime;
         }
+        UpdateUIs(chaosChanged);
+    }
+
+
+
+    private void StartTutorialRuntime()
+    {
+        _isPreparing = false;
+        if (_preparePanelGroup != null) _preparePanelGroup.alpha = 0f;
+        if (_topPanelGroup != null) _topPanelGroup.alpha = 1f;
+        if (_waveTmp != null) _waveTmp.gameObject.SetActive(false);
+        _menuPanel?.InitTutorial(_runtimeConfig.TutorialStageTitle);
+        RenderReflectionProbes();
+        UpdateUIs(0f);
+    }
+
+
+
+    private void UpdateTutorialRuntime()
+    {
+        if (_tutorialSimulationStopped)
+        {
+            _currentChaosRate = 0f;
+            UpdateUIs(0f);
+            return;
+        }
+
+        CountWorkingStudents();
+        CheckProfessorProgressing();
+        if (_tutorialPolicy.runProject)
+            ProgressProject();
+        if (_tutorialPolicy.runTimer)
+            DecreaseTutorialTime();
+
+        float chaosChanged = UpdateTutorialChaos();
+        _currentChaosRate = chaosChanged;
         UpdateUIs(chaosChanged);
     }
 
@@ -232,6 +323,11 @@ public class StageController : SceneSingleton<StageController>
 
     public void GoStore()
     {
+        if (IsTutorialRuntime)
+        {
+            Debug.LogError("튜토리얼 runtime에서는 정규 상점 흐름을 호출할 수 없습니다.", this);
+            return;
+        }
         Time.timeScale = 1;
         InventorySystem.Instance.SetMoney(_money); 
         SceneManager.LoadScene("Store");
@@ -255,14 +351,20 @@ public class StageController : SceneSingleton<StageController>
 
     private void CountWorkingStudents()
     {
+        int previousCount = _workingStudCount;
         _workingStudCount = 0;
         foreach (var student in _studentList)
         {
-            if (student.IsWorking)
+            if (student != null
+                && (!IsTutorialRuntime || student.CountsForStageAggregation)
+                && student.IsWorking)
             {
                 _workingStudCount++;
             }
         }
+
+        if (previousCount != _workingStudCount)
+            WorkingStudentCountChanged?.Invoke(_workingStudCount);
     }
 
 
@@ -286,8 +388,14 @@ public class StageController : SceneSingleton<StageController>
     {
         float studTotalProgress = _workingStudCount * _studTaskProgress * Time.deltaTime * _studTaskModifier.GetFinalValue(1);
         float profTotalProgress = _isProfWorking ? _profTaskProgress * Time.deltaTime : 0;
-        float finalProgress = (studTotalProgress + profTotalProgress) * WaveSystem.Instance.ProjectFactor;
+        float projectFactor = IsTutorialRuntime
+            ? _runtimeConfig.TutorialProjectFactor
+            : WaveSystem.Instance.ProjectFactor;
+        float finalProgress = (studTotalProgress + profTotalProgress) * projectFactor;
+        float previousProgress = _projectStat.Ratio;
         _projectStat.Increase(finalProgress);
+        if (!Mathf.Approximately(previousProgress, _projectStat.Ratio))
+            ProjectProgressChanged?.Invoke(previousProgress, _projectStat.Ratio);
     }
 
 
@@ -309,6 +417,12 @@ public class StageController : SceneSingleton<StageController>
 
     private void GameOver(bool isSuccess)
     {
+        if (IsTutorialRuntime)
+        {
+            StageFinished?.Invoke(isSuccess ? StageFinishResult.TimerExpired : StageFinishResult.EscapeFailure);
+            return;
+        }
+
         Time.timeScale = 0;
         Player.DisableController();
         Cursor.lockState = CursorLockMode.None;
@@ -334,27 +448,54 @@ public class StageController : SceneSingleton<StageController>
 
     private void OnStudentEscaped(PostStudent student)
     {
-        float chaosIncrease = _studEscapedPenalty * WaveSystem.Instance.ChaosFactor;
-        _chaosStat.Increase(chaosIncrease);
-        _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
-        PopupChaosWarning(new EscapedChaos(chaosIncrease));
-        _escapeStat.Increase(1);
+        if (IsTutorialRuntime && (student == null || !student.CountsForStageAggregation)) return;
+
+        float chaosFactor = IsTutorialRuntime
+            ? _runtimeConfig.TutorialChaosFactor
+            : WaveSystem.Instance.ChaosFactor;
+        float chaosIncrease = _studEscapedPenalty * chaosFactor;
+        if (!IsTutorialRuntime || _tutorialPolicy.allowEscapeChaos)
+        {
+            ApplyChaosIncrease(chaosIncrease, ChaosChangeReason.Escape);
+            PopupChaosWarning(new EscapedChaos(chaosIncrease));
+        }
+        if (IsTutorialRuntime)
+            _tutorialEscapeCount++;
+        else
+            _escapeStat.Increase(1);
+        EscapeCountChanged?.Invoke(EscapeCount, EscapeFailureThreshold);
+        StudentEscaped?.Invoke(student);
+
+        if (IsTutorialRuntime
+            && _tutorialPolicy.evaluateEscapeFailure
+            && EscapeCount >= EscapeFailureThreshold)
+        {
+            GameOver(false);
+        }
     }
 
 
 
     private void OnStudentDied(PostStudent student, HitInfo hitInfo)
     {
+        if (IsTutorialRuntime && (student == null || !student.CountsForStageAggregation)) return;
+
         if (hitInfo.attacker == Player.gameObject)
         {
             HitMarkerUI.Instance?.PlayKill();
             KillFeedbackController.Instance.PlayKillFeedback();
         }
-        if (student.IsDoingHazardBehavior == false && hitInfo.attacker == Player.gameObject)
+        bool wasHazardous = student.IsDoingHazardBehavior;
+        StudentDowned?.Invoke(student, hitInfo, wasHazardous);
+        if (wasHazardous == false
+            && hitInfo.attacker == Player.gameObject
+            && (!IsTutorialRuntime || _tutorialPolicy.allowInnocentDownChaos))
         {
-            float chaosIncrease = _innocentKillPenalty * WaveSystem.Instance.ChaosFactor;
-            _chaosStat.Increase(chaosIncrease);
-            _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
+            float chaosFactor = IsTutorialRuntime
+                ? _runtimeConfig.TutorialChaosFactor
+                : WaveSystem.Instance.ChaosFactor;
+            float chaosIncrease = _innocentKillPenalty * chaosFactor;
+            ApplyChaosIncrease(chaosIncrease, ChaosChangeReason.InnocentDown);
             PopupChaosWarning(new InnocentKillChaos(chaosIncrease));
         }
     }
@@ -363,7 +504,13 @@ public class StageController : SceneSingleton<StageController>
 
     private void OnProjectSuccessed()
     {
+        ProjectContributor contributors = ProjectContributor.None;
+        if (_workingStudCount > 0) contributors |= ProjectContributor.Student;
+        if (_isProfWorking) contributors |= ProjectContributor.Professor;
+        _projectCompletionId++;
         _projectStat.Initialize(true);
+        ProjectProgressChanged?.Invoke(1f, _projectStat.Ratio);
+        ProjectCompleted?.Invoke(_projectCompletionId, contributors);
         _money += _progectReward;
         _chaosUi.SpawnWarningPanel(new ProjectMoneyInfo(_progectReward));
         //SoundUtils.PlayUISFX(_moneyGainSD);
@@ -387,18 +534,18 @@ public class StageController : SceneSingleton<StageController>
 
     private void UpdateUIs(float chaosChanged)
     {
-        int minutes = Mathf.FloorToInt(_timerStat.Current / 60f);
-        int seconds = Mathf.FloorToInt(_timerStat.Current % 60f);
+        int minutes = Mathf.FloorToInt(TimerRemaining / 60f);
+        int seconds = Mathf.FloorToInt(TimerRemaining % 60f);
         //_timerTmp.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-        _timerTmp.text = _timerStat.Current.ToString("F0");
-        if (_timerStat.Current < 11)
+        _timerTmp.text = TimerRemaining.ToString("F0");
+        if (TimerRemaining < 11)
         {
             _timerTmp.text = $"<color=red>{_timerTmp.text}</color>";
         }
 
         _chaosTmp.text = _chaosStat.Current.ToString("F0");
 
-        _escapeTmp.text = $"{_escapeStat.Current.ToString("F0")} / {_escapeStat.Max.ToString("F0")}";
+        _escapeTmp.text = $"{EscapeCount} / {EscapeFailureThreshold}";
 
         _moneyTmp.text = _money.ToString("N0");
 
@@ -440,17 +587,75 @@ public class StageController : SceneSingleton<StageController>
         {
             chaosChanged = chaosCauseCount * _increasePerStud * WaveSystem.Instance.ChaosFactor;
             _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
-            _chaosStat.Increase(chaosChanged * Time.deltaTime);
+            float delta = chaosChanged * Time.deltaTime;
+            float previous = _chaosStat.Current;
+            _chaosStat.Increase(delta);
+            float actualDelta = _chaosStat.Current - previous;
+            if (!Mathf.Approximately(actualDelta, 0f))
+                ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, actualDelta, chaosChanged, ChaosChangeReason.ContinuousHazard));
         }
         else if (!_chaosStat.IsDepleted && _remainedChaosDecreaseTime <= 0)
         {
             if (GameManager.Instance.Difficulty != DifficultyLevel.Hard || _chaosStat.Current > 100)
             {
                 chaosChanged = _defaultReduction * _chaosDecreaseModifier.GetFinalValue();
-                _chaosStat.Decrease(chaosChanged * Time.deltaTime);
-                chaosChanged = -chaosChanged;
+                float rate = chaosChanged;
+                float previous = _chaosStat.Current;
+                _chaosStat.Decrease(rate * Time.deltaTime);
+                chaosChanged = -rate;
+                float actualDelta = _chaosStat.Current - previous;
+                if (!Mathf.Approximately(actualDelta, 0f))
+                    ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, actualDelta, chaosChanged, ChaosChangeReason.NaturalDecay));
             }
         }
+        _currentChaosRate = chaosChanged;
+        return chaosChanged;
+    }
+
+
+
+    private float UpdateTutorialChaos()
+    {
+        int chaosCauseCount = 0;
+        if (_tutorialPolicy.allowContinuousChaosSources)
+        {
+            foreach (PostStudent student in _studentList)
+            {
+                if (student != null && student.CountsForStageAggregation && student.IsCausingChaos)
+                    chaosCauseCount++;
+            }
+        }
+
+        float chaosChanged = 0f;
+        if (chaosCauseCount > 0)
+        {
+            chaosChanged = chaosCauseCount * _increasePerStud * _runtimeConfig.TutorialChaosFactor;
+            _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
+            float previous = _chaosStat.Current;
+            _chaosStat.Increase(chaosChanged * Time.deltaTime);
+            float actualDelta = _chaosStat.Current - previous;
+            if (!Mathf.Approximately(actualDelta, 0f))
+                ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, actualDelta, chaosChanged, ChaosChangeReason.ContinuousHazard));
+        }
+        else if (_tutorialPolicy.allowChaosDecay
+            && !_chaosStat.IsDepleted
+            && _remainedChaosDecreaseTime <= 0f)
+        {
+            if (GameManager.Instance.Difficulty != DifficultyLevel.Hard || _chaosStat.Current > 100f)
+            {
+                float rate = _defaultReduction * _chaosDecreaseModifier.GetFinalValue();
+                float previous = _chaosStat.Current;
+                _chaosStat.Decrease(rate * Time.deltaTime);
+                chaosChanged = -rate;
+                float actualDelta = _chaosStat.Current - previous;
+                if (!Mathf.Approximately(actualDelta, 0f))
+                    ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, actualDelta, chaosChanged, ChaosChangeReason.NaturalDecay));
+            }
+        }
+
+        if (_remainedChaosDecreaseTime > 0f)
+            _remainedChaosDecreaseTime -= Time.deltaTime;
+
         return chaosChanged;
     }
 
@@ -460,6 +665,19 @@ public class StageController : SceneSingleton<StageController>
     {
         _timerStat.Decrease(Time.deltaTime);
         //_chaosStat.Decrease(_defaultReduction * Time.deltaTime);
+    }
+
+
+
+    private void DecreaseTutorialTime()
+    {
+        if (_tutorialTimerRemaining <= 0f || _tutorialTimerFinishedReported) return;
+        _tutorialTimerRemaining = Mathf.Max(0f, _tutorialTimerRemaining - Time.deltaTime);
+        if (_tutorialTimerRemaining <= 0f)
+        {
+            _tutorialTimerFinishedReported = true;
+            GameOver(true);
+        }
     }
 
 
@@ -490,21 +708,249 @@ public class StageController : SceneSingleton<StageController>
 
 
 
+    private void ApplyChaosIncrease(float requestedDelta, ChaosChangeReason reason)
+    {
+        float previous = _chaosStat.Current;
+        _chaosStat.Increase(requestedDelta);
+        float actualDelta = _chaosStat.Current - previous;
+        if (requestedDelta > 0f)
+            _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
+        if (actualDelta > 0f)
+        {
+            ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, actualDelta, 0f, reason));
+        }
+    }
+
+
+
+    private void OnTimerDepleted()
+    {
+        GameOver(true);
+    }
+
+
+
+    private void OnEscapeLimitReached()
+    {
+        if (!IsTutorialRuntime)
+            GameOver(false);
+    }
+
+
+
+    public bool ApplyTutorialPolicy(TutorialStagePolicy policy)
+    {
+        if (!EnsureTutorialControl(nameof(ApplyTutorialPolicy))) return false;
+        _tutorialPolicy = policy;
+        _tutorialSimulationStopped = false;
+        return true;
+    }
+
+
+
+    public bool SetChaosForTutorial(float value)
+    {
+        if (!EnsureTutorialControl(nameof(SetChaosForTutorial))) return false;
+        float previous = _chaosStat.Current;
+        _chaosStat.Initialize(true);
+        _chaosStat.Increase(Mathf.Clamp(value, 0f, _chaosStat.Max));
+        _remainedChaosDecreaseTime = 0f;
+        _currentChaosRate = 0f;
+        float delta = _chaosStat.Current - previous;
+        if (!Mathf.Approximately(delta, 0f))
+            ChaosChanged?.Invoke(new ChaosChangedData(_chaosStat.Current, delta, 0f, ChaosChangeReason.Reset));
+        return true;
+    }
+
+
+
+    public bool SetProjectProgressForTutorial(float ratio)
+    {
+        if (!EnsureTutorialControl(nameof(SetProjectProgressForTutorial))) return false;
+        float previous = _projectStat.Ratio;
+        _projectStat.Initialize(true);
+        _projectStat.Increase(Mathf.Clamp01(ratio) * _projectStat.Max);
+        if (!Mathf.Approximately(previous, _projectStat.Ratio))
+            ProjectProgressChanged?.Invoke(previous, _projectStat.Ratio);
+        return true;
+    }
+
+
+
+    public bool SetEscapeCountForTutorial(int count, int failureThreshold)
+    {
+        if (!EnsureTutorialControl(nameof(SetEscapeCountForTutorial))) return false;
+        _tutorialEscapeFailureThreshold = Mathf.Max(1, failureThreshold);
+        _tutorialEscapeCount = Mathf.Max(0, count);
+        _escapeStat.Initialize(true);
+        _escapeStat.Increase(_tutorialEscapeCount);
+        EscapeCountChanged?.Invoke(EscapeCount, EscapeFailureThreshold);
+        return true;
+    }
+
+
+
+    public bool SetTimerForTutorial(float seconds)
+    {
+        if (!EnsureTutorialControl(nameof(SetTimerForTutorial))) return false;
+        _tutorialTimerRemaining = Mathf.Max(0f, seconds);
+        _tutorialTimerFinishedReported = false;
+        _timerStat.Initialize(true);
+        _timerStat.Increase(_tutorialTimerRemaining);
+        return true;
+    }
+
+
+
+    public bool SetSessionMoneyForTutorial(int money)
+    {
+        if (!EnsureTutorialControl(nameof(SetSessionMoneyForTutorial))) return false;
+        _money = Mathf.Max(0, money);
+        return true;
+    }
+
+
+
+    public bool TrySpendTutorialSessionMoney(int cost)
+    {
+        if (!EnsureTutorialControl(nameof(TrySpendTutorialSessionMoney))) return false;
+        cost = Mathf.Max(0, cost);
+        if (_money < cost) return false;
+        _money -= cost;
+        return true;
+    }
+
+
+
+    public bool StopAllStageSimulationForTutorial()
+    {
+        if (!EnsureTutorialControl(nameof(StopAllStageSimulationForTutorial))) return false;
+        _tutorialSimulationStopped = true;
+        _currentChaosRate = 0f;
+        return true;
+    }
+
+
+
+    public bool ResumeStageSimulationForTutorial()
+    {
+        if (!EnsureTutorialControl(nameof(ResumeStageSimulationForTutorial))) return false;
+        _tutorialSimulationStopped = false;
+        return true;
+    }
+
+
+
+    public bool RegisterStudent(PostStudent student)
+    {
+        if (student == null || _studentList.Contains(student)) return false;
+        _studentList.Add(student);
+        HookStudent(student, true);
+        return true;
+    }
+
+
+
+    public bool UnregisterStudent(PostStudent student)
+    {
+        if (student == null || !_studentList.Remove(student)) return false;
+        student.DieEvent.RemoveListener(OnStudentDied);
+        student.EscapeEvent.RemoveListener(OnStudentEscaped);
+        StudentUnregistered?.Invoke(student);
+        return true;
+    }
+
+
+
+    private void HookStudent(PostStudent student, bool emitRegistration)
+    {
+        if (student == null) return;
+        student.DieEvent.RemoveListener(OnStudentDied);
+        student.EscapeEvent.RemoveListener(OnStudentEscaped);
+        student.DieEvent.AddListener(OnStudentDied);
+        student.EscapeEvent.AddListener(OnStudentEscaped);
+        if (emitRegistration)
+            StudentRegistered?.Invoke(student);
+    }
+
+
+
+    private bool EnsureTutorialControl(string api)
+    {
+        if (IsTutorialRuntime) return true;
+        Debug.LogError($"{api}는 명시적인 Tutorial StageRuntimeConfig가 적용된 runtime에서만 호출할 수 있습니다.", this);
+        return false;
+    }
+
+
+
+    protected override void OnDestroy()
+    {
+        foreach (PostStudent student in _studentList)
+        {
+            if (student == null) continue;
+            student.DieEvent.RemoveListener(OnStudentDied);
+            student.EscapeEvent.RemoveListener(OnStudentEscaped);
+        }
+        base.OnDestroy();
+    }
+
+
+
     public void GunShoot()
     {
-        float chaosIncrease = _gunShotPenalty * WaveSystem.Instance.ChaosFactor;
-        _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
-        _chaosStat.Increase(chaosIncrease);
+        if (IsTutorialRuntime && !_tutorialPolicy.allowGunshotChaos) return;
+        float chaosFactor = IsTutorialRuntime
+            ? _runtimeConfig.TutorialChaosFactor
+            : WaveSystem.Instance.ChaosFactor;
+        float chaosIncrease = _gunShotPenalty * chaosFactor;
+        ApplyChaosIncrease(chaosIncrease, ChaosChangeReason.Gunshot);
     }
 
 
 
     public void NormalFoodRemoved()
     {
-        float chaosIncrease = _normalFoodRemovedPenalty * WaveSystem.Instance.ChaosFactor;
-        _chaosStat.Increase(chaosIncrease);
-        _remainedChaosDecreaseTime = CHAOS_RECREASE_DELAY;
+        if (IsTutorialRuntime && !_tutorialPolicy.allowNormalFoodRemovedChaos) return;
+        float chaosFactor = IsTutorialRuntime
+            ? _runtimeConfig.TutorialChaosFactor
+            : WaveSystem.Instance.ChaosFactor;
+        float chaosIncrease = _normalFoodRemovedPenalty * chaosFactor;
+        ApplyChaosIncrease(chaosIncrease, ChaosChangeReason.NormalFoodRemoved);
         PopupChaosWarning(new NormalFoodRemovedChaos(chaosIncrease));
+    }
+
+
+
+    public bool SetTutorialEquipSlotItems(IReadOnlyList<WeaponItem> items)
+    {
+        if (!EnsureTutorialControl(nameof(SetTutorialEquipSlotItems))) return false;
+        if (items == null)
+        {
+            Debug.LogError("Tutorial equip slot items cannot be null.", this);
+            return false;
+        }
+        if (items.Count > _equipSlotList.Count)
+        {
+            Debug.LogError($"Tutorial loadout has {items.Count} slots, but the stage HUD has {_equipSlotList.Count}.", this);
+            return false;
+        }
+        for (int i = 0; i < _equipSlotList.Count; i++)
+        {
+            if (_equipSlotList[i] != null) continue;
+            Debug.LogError($"Tutorial equip UI slot {i} is missing.", this);
+            return false;
+        }
+
+        for (int i = 0; i < _equipSlotList.Count; i++)
+        {
+            WeaponItem item = i < items.Count ? items[i] : null;
+            if (item != null)
+                _equipSlotList[i].SetItem(item);
+            else
+                _equipSlotList[i].ClearItem();
+        }
+        return true;
     }
 
 

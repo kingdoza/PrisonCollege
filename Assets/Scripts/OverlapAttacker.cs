@@ -36,6 +36,8 @@ public class OverlapAttacker : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!_isAttacking) return;
+        PostStudent attackingStudent = _rootObject != null ? _rootObject.GetComponent<PostStudent>() : null;
+        if (attackingStudent != null && attackingStudent.SuppressOutgoingDamage) return;
 
         // 1. 최상위 부모 기준으로 중복 체크
         GameObject rootTarget = other.transform.root.gameObject;

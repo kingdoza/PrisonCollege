@@ -69,6 +69,21 @@ public class WaveSystem : PersistentSingleton<WaveSystem>
 
 
 
+    public bool TryRollEnforcement(out bool shouldEnforce)
+    {
+        shouldEnforce = false;
+        if (waveEntries == null
+            || _currentWave <= 0
+            || _currentWave > waveEntries.Length)
+            return false;
+
+        shouldEnforce = UnityEngine.Random.value
+            < waveEntries[_currentWave - 1].enforceProb;
+        return true;
+    }
+
+
+
     public void NewWaveEntered()
     {
         _currentWave++;

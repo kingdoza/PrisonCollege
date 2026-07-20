@@ -12,6 +12,8 @@ public abstract class Recharger : MonoBehaviour
     private bool _isPreparing = true;
 
     private AttributeModifier _attributeModifier;
+    private bool _tutorialConfigured;
+    private int _tutorialSessionCost;
 
 
 
@@ -48,6 +50,9 @@ public abstract class Recharger : MonoBehaviour
     private void RechargeWeapons()
     {
         if (!_canRecharge) return;
+        if (_tutorialConfigured
+            && StageController.Instance.SessionMoney < _tutorialSessionCost)
+            return;
         bool recharged = false;
         foreach (var weapon in _targetWeapons)
         {
@@ -62,9 +67,54 @@ public abstract class Recharger : MonoBehaviour
 
         if (recharged)
         {
+            if (_tutorialConfigured
+                && !StageController.Instance.TrySpendTutorialSessionMoney(_tutorialSessionCost))
+                return;
             _canRecharge = false;
             _supplyProgress.Initialize(true);
             SoundUtils.PlayScene2DSFX(_rechargeSD);
         }
+    }
+
+
+
+    public void ConfigureTutorialRuntime(bool isEnabled, int sessionCost)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime)
+        {
+            Debug.LogError("Recharger 튜토리얼 설정 API는 튜토리얼 runtime에서만 사용할 수 있습니다.", this);
+            return;
+        }
+
+        _tutorialConfigured = true;
+        _tutorialSessionCost = Mathf.Max(0, sessionCost);
+        _interaction.InteractState = isEnabled;
+        _isPreparing = !isEnabled;
+    }
+
+
+
+    public TutorialRechargerState CaptureTutorialState()
+    {
+        return new TutorialRechargerState
+        {
+            recharger = this,
+            canRecharge = _canRecharge,
+            isPreparing = _isPreparing,
+            interactable = _interaction.InteractState,
+            supplyProgress = _supplyProgress.Current,
+        };
+    }
+
+
+
+    public void RestoreTutorialState(TutorialRechargerState state)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime) return;
+        _canRecharge = state.canRecharge;
+        _isPreparing = state.isPreparing;
+        _interaction.InteractState = state.interactable;
+        _supplyProgress.Initialize(true);
+        _supplyProgress.Increase(Mathf.Clamp(state.supplyProgress, 0f, _supplyProgress.Max));
     }
 }

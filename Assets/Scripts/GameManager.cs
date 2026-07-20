@@ -19,6 +19,7 @@ public class GameManager : PersistentSingleton<GameManager>
     [SerializeField] private string _store;
     [SerializeField] private string _arena = "Arena";
     [SerializeField] private string _testStart = "TestStore";
+    [SerializeField] private string _tutorialScene = "TutorialStage";
     private StageInfo _currentStage;
     [SerializeField] private DifficultyLevel _currentDifficulty;
     [Header("Scene Datas")]
@@ -37,6 +38,9 @@ public class GameManager : PersistentSingleton<GameManager>
     private Coroutine _bgmChangeCoroutine;
     private string _previousSceneName;
     private string _currentSceneName;
+    private const string TUTORIAL_COMPLETED_KEY = "TutorialCompleted";
+
+    public bool IsTutorialCompleted => PlayerPrefs.GetInt(TUTORIAL_COMPLETED_KEY, 0) == 1;
 
 
 
@@ -86,6 +90,10 @@ public class GameManager : PersistentSingleton<GameManager>
             ChangeBGM(_mainPD);
         }
         else if (scene.name.Equals(_stagePrepare))
+        {
+            ChangeBGM(_wavePD);
+        }
+        else if (scene.name.Equals(_tutorialScene))
         {
             ChangeBGM(_wavePD);
         }
@@ -150,7 +158,8 @@ public class GameManager : PersistentSingleton<GameManager>
             {
                 // 다음 곡 즉시 재생
                 _bgmEmitter = PlayBGM(currentPlaylist, 1f, false);
-                if (SceneManager.GetActiveScene().name.StartsWith(_stagePrefix))
+                if (SceneManager.GetActiveScene().name.StartsWith(_stagePrefix)
+                    || SceneManager.GetActiveScene().name.Equals(_tutorialScene))
                 {
                     _bgmEmitter.SetVolumeRate(0.4f);
                 }
@@ -184,6 +193,39 @@ public class GameManager : PersistentSingleton<GameManager>
     public void StartStage()
     {
         SceneManager.LoadScene($"{_stagePrefix}{_currentStage.number}");
+    }
+
+
+
+    public void StartTutorial()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(_tutorialScene);
+    }
+
+
+
+    public void MarkTutorialCompleted()
+    {
+        PlayerPrefs.SetInt(TUTORIAL_COMPLETED_KEY, 1);
+        PlayerPrefs.Save();
+    }
+
+
+
+    public void ExitTutorialToMain()
+    {
+        MarkTutorialCompleted();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(_mainScreen);
+    }
+
+
+
+    public void AbortTutorialToMain()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(_mainScreen);
     }
 
 
@@ -241,6 +283,11 @@ public class GameManager : PersistentSingleton<GameManager>
 
     public void Restart()
     {
+        if (SceneManager.GetActiveScene().name == _tutorialScene)
+        {
+            StartTutorial();
+            return;
+        }
         PrepareStage(_currentStage.number, _currentDifficulty);
     }
 

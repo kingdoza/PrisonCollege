@@ -58,6 +58,7 @@ public class Blackboard
     public bool hasToFrenzy;
 
     public bool isForceBehavior;
+    public bool useAssignedSpot;
 
     public CoopData coopData;
     public CoopData2 coopData2;

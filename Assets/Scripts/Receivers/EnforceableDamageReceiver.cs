@@ -10,7 +10,8 @@ public class EnforceableDamageReceiver : DamageReceiver
 
     protected override void Awake()
     {
-        bool hasToEnforce = WaveSystem.Instance.HasToEnforce;
+        bool hasToEnforce = false;
+        WaveSystem.Instance?.TryRollEnforcement(out hasToEnforce);
         _health = hasToEnforce ? _enforcedHealth : _defaultHealth;
         _health.Initialize();
         _enforceObject.SetActive(hasToEnforce);

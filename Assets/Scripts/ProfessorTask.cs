@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ProfessorTask : MonoBehaviour
@@ -9,7 +10,10 @@ public class ProfessorTask : MonoBehaviour
     private Click _interaction;
     private Professor _professor;
     private bool _isTasking = false;
+    private bool _tutorialInteractionAllowed = true;
     public bool IsTasking => _isTasking;
+    public event Action<ProfessorTask> TaskStartedEvent;
+    public event Action<ProfessorTask, ProfessorTaskStopReason> TaskStoppedEvent;
 
 
 
@@ -61,7 +65,7 @@ public class ProfessorTask : MonoBehaviour
 
         if (Input.GetButtonDown("Horizontal") || Input.GetButtonDown("Vertical"))
         {
-            StopTask();
+            StopTask(ProfessorTaskStopReason.Movement);
         }
     }
 
@@ -69,9 +73,10 @@ public class ProfessorTask : MonoBehaviour
 
     private void OnTaskStateChanged()
     {
+        if (!_tutorialInteractionAllowed) return;
         if (_isTasking)
         {
-            StopTask();
+            StopTask(ProfessorTaskStopReason.InteractToggle);
         }
         else
         {
@@ -90,6 +95,7 @@ public class ProfessorTask : MonoBehaviour
         _crosshairPanel.SetActive(true);
         _professor.gameObject.transform.parent = null;
         _monitor.ChangeDisplay(DisplayState.Off);
+        TaskStoppedEvent?.Invoke(this, ProfessorTaskStopReason.Death);
     }
 
 
@@ -102,11 +108,12 @@ public class ProfessorTask : MonoBehaviour
         AttachProp(_professor.gameObject, _cameraSocket);
         _professor.SetTaskPose();
         _monitor.ChangeDisplay(DisplayState.Working);
+        TaskStartedEvent?.Invoke(this);
     }
 
 
 
-    private void StopTask()
+    private void StopTask(ProfessorTaskStopReason reason)
     {
         _interaction.FillAmount = 0;
         _taskInfoPanel.SetActive(false);
@@ -115,6 +122,31 @@ public class ProfessorTask : MonoBehaviour
         _professor.gameObject.transform.parent = null;
         _professor.UnsetTaskPose();
         _monitor.ChangeDisplay(DisplayState.Off);
+        TaskStoppedEvent?.Invoke(this, reason);
+    }
+
+
+
+    public void ForceStopTask(ProfessorTaskStopReason reason = ProfessorTaskStopReason.StepExit)
+    {
+        if (!_isTasking) return;
+        StopTask(reason);
+    }
+
+
+
+    public bool SetTutorialInteractionAllowed(bool isAllowed)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime)
+        {
+            Debug.LogError("SetTutorialInteractionAllowed는 Tutorial runtime에서만 호출할 수 있습니다.", this);
+            return false;
+        }
+
+        _tutorialInteractionAllowed = isAllowed;
+        if (!isAllowed)
+            ForceStopTask(ProfessorTaskStopReason.StepExit);
+        return true;
     }
 
 

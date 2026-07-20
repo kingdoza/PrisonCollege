@@ -16,6 +16,7 @@ public class FireSuppressionSystem : SceneSingleton<FireSuppressionSystem>
     private bool _isFlooding = false;
 
     public float FloodFillRatio => _floodProgress.Ratio;
+    public bool IsFlooding => _isFlooding;
 
 
 
@@ -111,5 +112,46 @@ public class FireSuppressionSystem : SceneSingleton<FireSuppressionSystem>
     private void ExtinguishAllFires()
     {
         FireExtinguishEvent?.Invoke();
+    }
+
+
+
+    public TutorialFireSuppressionState CaptureTutorialState()
+    {
+        return new TutorialFireSuppressionState
+        {
+            system = this,
+            isFlooding = _isFlooding,
+            floodFillRatio = FloodFillRatio,
+        };
+    }
+
+
+
+    public bool RestoreTutorialState(TutorialFireSuppressionState state)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime)
+        {
+            Debug.LogError("소방 시설 튜토리얼 복원 API는 Tutorial runtime에서만 사용할 수 있습니다.", this);
+            return false;
+        }
+        if (state.isFlooding)
+        {
+            Debug.LogError("8단계 최초 체크포인트는 소방 침수 동작 중에 캡처할 수 없습니다.", this);
+            return false;
+        }
+
+        _floodSequence?.Kill();
+        _floodSequence = null;
+        DOTween.Kill(this);
+        _isFlooding = false;
+        _floodProgress.Initialize(true);
+        _floodTransform.localPosition = new Vector3(
+            _floodTransform.localPosition.x,
+            _lowerPosY,
+            _floodTransform.localPosition.z);
+        _floodTransform.gameObject.SetActive(false);
+        _sprinklerCtrl.TurnOffImmediate();
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Events;
 
 public class Professor : MonoBehaviour, IAttackable
@@ -32,6 +32,9 @@ public class Professor : MonoBehaviour, IAttackable
     public UnityEvent<string> DieEvent = new();
     public UnityEvent StaminaRunoutEvent = new();
     public float JumpStamina => _jumpStamina;
+    public WeaponController WeaponController => _weaponController;
+    public float CurrentHealth => _health != null ? _health.Current : 0f;
+    public float CurrentStamina => _stamina != null ? _stamina.Current : 0f;
 
     private void Awake()
     {
@@ -59,7 +62,17 @@ public class Professor : MonoBehaviour, IAttackable
         _deadCanvas.alpha = 0;
         _health.ResetEvent.AddListener(_ => _healthVolume.AdjustVolume(_health.Ratio));
         _playerCamera.DisablePhysics();
-        _weaponController.EquipWeapon(0, gameObject);
+        if (StageController.Instance != null && StageController.Instance.IsTutorialRuntime)
+        {
+            _weaponController.InitializeTutorialLoadout(
+                StageController.Instance.RuntimeConfig.TrainingLoadout,
+                gameObject,
+                0);
+        }
+        else
+        {
+            _weaponController.EquipWeapon(0, gameObject);
+        }
         _healthVolume.AdjustVolume(_health.Ratio);
     }
 
@@ -163,6 +176,58 @@ public class Professor : MonoBehaviour, IAttackable
 
 
 
+    public TutorialPlayerState CaptureTutorialState()
+    {
+        return new TutorialPlayerState
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            viewRotation = _playerCamera.transform.rotation,
+            viewPitch = _playerCamera.CurrentPitch,
+            health = _health.Current,
+            stamina = _stamina.Current,
+        };
+    }
+
+
+
+    public void RestoreTutorialState(TutorialPlayerState state)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime)
+        {
+            Debug.LogError("Professor 튜토리얼 복원 API는 튜토리얼 runtime에서만 사용할 수 있습니다.", this);
+            return;
+        }
+
+        if (_health.IsDepleted)
+            Revive();
+
+        _health.Initialize(true);
+        _health.Increase(Mathf.Clamp(state.health, 0f, _health.Max));
+        _stamina.Initialize(true);
+        _stamina.Increase(Mathf.Clamp(state.stamina, 0f, _stamina.Max));
+        transform.SetPositionAndRotation(state.position, state.rotation);
+        _rigidbody.position = state.position;
+        _rigidbody.rotation = state.rotation;
+        _playerCamera.RestoreTutorialView(state.viewRotation, state.viewPitch);
+        _healthVolume.AdjustVolume(_health.Ratio);
+    }
+
+
+
+    public void SetTutorialInvincible(bool isInvincible)
+    {
+        if (StageController.Instance == null || !StageController.Instance.IsTutorialRuntime)
+        {
+            Debug.LogError("Professor 튜토리얼 무적 API는 튜토리얼 runtime에서만 사용할 수 있습니다.", this);
+            return;
+        }
+
+        _damageReceiver.IsInvincible = isInvincible;
+    }
+
+
+
     public void SetTaskPose()
     {
         _controller.StopSprinting();
@@ -196,6 +261,7 @@ public class Professor : MonoBehaviour, IAttackable
     private void HandleWeaponAttack()
     {
         if (_weaponController.IsHiding) return;
+        if (_weaponController.CurrentWeapon == null) return;
         if (Input.GetMouseButtonDown(0))
         {
             float currentWeaponStaminaCost = _weaponController.CurrentWeapon.StaminaCost;

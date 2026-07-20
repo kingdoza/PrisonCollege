@@ -42,6 +42,13 @@ public class MainScreen : MonoBehaviour
 
 
 
+    public void Tutorial_Btn()
+    {
+        GameManager.Instance.StartTutorial();
+    }
+
+
+
     public void Setting_Btn()
     {
         EscapeInputSystem.Instance.EnablePanel(_settingPanel);

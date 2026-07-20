@@ -219,6 +219,7 @@ public class MoveToSpot : BT_Node
         {
             Debug.Log(_bb.Agent.stoppingDistance);
             _bb.Anim.SetFloat("MoveSpeed", 0);
+            _bb.Avatar.GetComponent<PostStudent>()?.NotifyTutorialBehaviorActionStarted();
             return NodeState.Success;
         }
         float currentSpeed = _bb.Agent.speed / _speedModifier.GetFinalValue();
@@ -954,6 +955,7 @@ public class OverrideAttackTarget : BT_Node
 {
     private Func<GameObject> _getTargetFunc;
     private DamageReceiver _currentTargetDR;
+    private UnityEngine.Events.UnityAction<HitInfo> _targetDepletedHandler;
 
     public OverrideAttackTarget(Func<GameObject> getTargetFunc)
     {
@@ -987,7 +989,10 @@ public class OverrideAttackTarget : BT_Node
                 _currentTargetDR = dr;
 
                 // 타겟이 파괴(사망)되면 실행될 로직 등록
-                dr.DepletedEvent.AddListener(_ => DOVirtual.DelayedCall(0.2f, () => OnTargetDepleted(), false));
+                _targetDepletedHandler = _ => DOVirtual
+                    .DelayedCall(0.2f, OnTargetDepleted, false)
+                    .SetTarget(this);
+                dr.DepletedEvent.AddListener(_targetDepletedHandler);
 
                 //dr.DepletedEvent.AddListener(_ => OnTargetDepleted());
             }
@@ -1015,17 +1020,27 @@ public class OverrideAttackTarget : BT_Node
 
     private void UnsubscribeCurrent()
     {
+        DOTween.Kill(this);
         if (_currentTargetDR != null)
         {
-            _currentTargetDR.DepletedEvent.RemoveListener(_ => OnTargetDepleted());
+            if (_targetDepletedHandler != null)
+                _currentTargetDR.DepletedEvent.RemoveListener(_targetDepletedHandler);
             _currentTargetDR = null;
         }
+        _targetDepletedHandler = null;
     }
 
     // 노드가 리셋될 때 안전하게 구독 해제
     public override void Reset()
     {
-        UnsubscribeCurrent();
+        // 전투 분기로 전환되며 호출되는 Reset에서는 사망 이벤트 구독을 유지한다.
+        // runtime 정리처럼 target을 먼저 비운 경우에만 남은 구독과 지연 호출을 해제한다.
+        if (_bb == null
+            || _bb.targetObject == null
+            || _bb.targetDamageable == null)
+        {
+            UnsubscribeCurrent();
+        }
         base.Reset();
     }
 }
@@ -1307,6 +1322,8 @@ public class FindDestSpot : BT_Node
 {
     private float _sampleRange = 2.0f; // 스팟 주변에서 NavMesh를 검색할 반경
     private PostStudent _student;
+    private BehaveSpot _lastAssignedSpot;
+    private bool _hasEnteredAssignedSpot;
 
     public override NodeState Evaluate()
     {
@@ -1314,6 +1331,31 @@ public class FindDestSpot : BT_Node
             _student = _bb.Avatar.GetComponent<PostStudent>();
         BehaviorType targetType = _bb.destBehavior;
 
+        if (_bb.useAssignedSpot && _bb.destSpot != null)
+        {
+            BehaveSpot assignedSpot = _bb.destSpot;
+            bool isRiskTrainingLoop = _student != null
+                && _student.SuppressOutgoingDamage
+                && _hasEnteredAssignedSpot
+                && _lastAssignedSpot == assignedSpot;
+            if (isRiskTrainingLoop)
+            {
+                assignedSpot.Release(_student);
+                if (!_bb.useAssignedSpot
+                    || _bb.destSpot != assignedSpot
+                    || !_student.SuppressOutgoingDamage)
+                    return NodeState.Failure;
+                assignedSpot.Use(_student);
+            }
+
+            _lastAssignedSpot = assignedSpot;
+            _hasEnteredAssignedSpot = true;
+            _bb.destPosition = assignedSpot.transform.position;
+            return NodeState.Success;
+        }
+
+        _lastAssignedSpot = null;
+        _hasEnteredAssignedSpot = false;
         _bb.destSpot?.Release(_student);
         _bb.destSpot = null;
 

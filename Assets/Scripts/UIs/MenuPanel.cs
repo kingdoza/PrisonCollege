@@ -61,6 +61,18 @@ public class MenuPanel : MonoBehaviour, IEscapeControllable
 
 
 
+    public void InitTutorial(string stageTitle)
+    {
+        _itemInfoPanel?.HidePanel();
+        Hide();
+        if (_titleTmp != null)
+            _titleTmp.text = stageTitle ?? string.Empty;
+        if (_passiveSlotsEntry?.parent != null)
+            _passiveSlotsEntry.parent.gameObject.SetActive(false);
+    }
+
+
+
     private void SlotPointerClicked(SlotSelector targetSlot)
     {
         _selectedSlot?.Darken();

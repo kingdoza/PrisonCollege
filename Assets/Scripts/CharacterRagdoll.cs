@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -46,9 +46,12 @@ public class CharacterRagdoll : MonoBehaviour
     private BoneTransform[] _ragdollBones;
     private Transform[] _bones;
     private Tween _standUpTween;
+    private bool _hasAutoStandUpRuntimeOverride;
+    private bool _autoStandUpBeforeRuntimeOverride;
 
     public UnityEvent StandUpStartEvent = new();
     public UnityEvent StandUpCompleteEvent = new();
+    public bool IsAutoStandUpEnabled => _isAutoStandUp;
 
 
 
@@ -100,6 +103,28 @@ public class CharacterRagdoll : MonoBehaviour
         _totalTimer = 0f;
         DOTween.Kill(this);
         SetRagdoll(false);
+    }
+
+
+
+    public void SetAutoStandUpRuntimeOverride(bool isEnabled)
+    {
+        if (!_hasAutoStandUpRuntimeOverride)
+        {
+            _autoStandUpBeforeRuntimeOverride = _isAutoStandUp;
+            _hasAutoStandUpRuntimeOverride = true;
+        }
+
+        _isAutoStandUp = isEnabled;
+    }
+
+
+
+    public void RestoreAutoStandUpRuntimeOverride()
+    {
+        if (!_hasAutoStandUpRuntimeOverride) return;
+        _isAutoStandUp = _autoStandUpBeforeRuntimeOverride;
+        _hasAutoStandUpRuntimeOverride = false;
     }
 
 

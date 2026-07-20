@@ -21,6 +21,14 @@ public class Projectile : MonoBehaviour
     protected virtual void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        TutorialTransientRegistry.Active?.Register(gameObject);
+    }
+
+
+
+    protected virtual void OnDestroy()
+    {
+        TutorialTransientRegistry.Active?.Unregister(gameObject);
     }
 
     protected virtual void Start()

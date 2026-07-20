@@ -27,6 +27,10 @@ public class AnimAttack : MonoBehaviour
 
     public void OnAttackHit()
     {
+        PostStudent attackingStudent = GetComponentInParent<PostStudent>();
+        if (attackingStudent != null && attackingStudent.SuppressOutgoingDamage)
+            return;
+
         // 1. 캐릭터 정면 방향으로 SphereCastAll 실행
         // 시작 지점: 현재 위치 + 약간 위(허리 높이), 방향: 정면
         Vector3 origin = transform.position + Vector3.up * 1.0f;

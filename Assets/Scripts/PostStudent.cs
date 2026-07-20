@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -15,6 +17,16 @@ public class PostStudent : MonoBehaviour
     public static float _fastRunSpeed = 5.47f;
     public static float _sprintSpeed = 6.75f;
 
+    // Arena Spectator?� ?�일???�택 가중치: Cheer/Rally/Clap 2, Punch/Jab 1.
+    private static readonly string[] _tutorialCheerTriggerPool =
+    {
+        "Cheer_S", "Cheer_S",
+        "Rally_S", "Rally_S",
+        "Clap_S", "Clap_S",
+        "Punch_S",
+        "Jab_S",
+    };
+
     private RandomSelector _speedSelector;
 
     private NavMeshAgent _agent;
@@ -22,9 +34,9 @@ public class PostStudent : MonoBehaviour
     private BT_Node _root;
     private Blackboard _blackboard;
     private CapsuleCollider _characterCollider;
-    [Header("설정")]
-    //[SerializeField] private float _changeInterval = 2.0f; // 2초 간격
-    //[SerializeField] private Transform _targetDestination; // 이동 목표 지점
+    [Header("?�정")]
+    //[SerializeField] private float _changeInterval = 2.0f; // 2�?간격
+    //[SerializeField] private Transform _targetDestination; // ?�동 목표 지??
     //
     //[SerializeField] private BehaveSpot _chairSpot;
     //[SerializeField] private SpotGroup _restSpots;
@@ -49,6 +61,15 @@ public class PostStudent : MonoBehaviour
     private PlateAttacher _plateAttacher;
     private SingAttacher _singAttacher;
     private SoundBehavior _soundBehavior;
+    private bool _sharedRuntimeInitialized;
+    private bool _tutorialBehaviorRuntimeInitialized;
+    private bool _isInitializingTutorialRuntime;
+    private TutorialStudentMode _tutorialMode;
+    private bool _tutorialBoostBlocked;
+    private bool _hasScriptedBehaviorRequest;
+    private bool _scriptedActionStartedReported;
+    private ScriptedBehaviorRequest _scriptedBehaviorRequest;
+    private Coroutine _tutorialCheerCoroutine;
 
     [SerializeField] private OverlapAttacker _bodyOverlapAttacker;
     [SerializeField] private OverlapAttacker _tackleOverlapAttacker;
@@ -58,21 +79,38 @@ public class PostStudent : MonoBehaviour
     [Header("Audios")]
     [SerializeField] private SoundData _bodyHitSD;
 
-    public bool IsWorking => 
+    public bool IsWorking =>
         Blackboard != null && Blackboard.destBehavior == BehaviorType.Work
         && _anim != null && _anim.enabled && _anim.GetBool("Typing");
 
-    public bool IsDoingHazardBehavior => (
+    public bool IsDoingHazardBehavior => Blackboard != null && (
         Blackboard.destBehavior.IsHazard()
         || (Blackboard.destBehavior == BehaviorType.UseMicrowave && _plateAttacher.CurrentFood != null && _plateAttacher.CurrentFood.isCauseFire)
         || Blackboard.targetDamageable != null
         || (Blackboard.destBehavior == BehaviorType.Sing && _singAttacher.IsBad));
 
     public bool IsCausingChaos => _damageReceiver != null && Blackboard != null && _singAttacher != null && _damageReceiver.CanEffect && (Blackboard.targetDamageable != null || (Blackboard.destBehavior == BehaviorType.Sing && _singAttacher.IsBad));
-    public bool IsComputerBehavior =>
+    public bool IsComputerBehavior => Blackboard != null && (
         Blackboard.destBehavior == BehaviorType.Work
         || Blackboard.destBehavior == BehaviorType.Game
-        || Blackboard.destBehavior == BehaviorType.Hack;
+        || Blackboard.destBehavior == BehaviorType.Hack);
+    public bool IsTutorialBehaviorRuntimeInitialized => _tutorialBehaviorRuntimeInitialized;
+    public TutorialStudentMode TutorialMode => _tutorialMode;
+    public bool CountsForStageAggregation => !_tutorialBehaviorRuntimeInitialized
+        || _tutorialMode == TutorialStudentMode.Training
+        || _tutorialMode == TutorialStudentMode.MiniWave;
+    public bool SuppressScriptedWorldConsequences => _tutorialBehaviorRuntimeInitialized
+        && _hasScriptedBehaviorRequest
+        && _scriptedBehaviorRequest.suppressWorldConsequences;
+    public bool SuppressOutgoingDamage => _tutorialBehaviorRuntimeInitialized
+        && _hasScriptedBehaviorRequest
+        && _scriptedBehaviorRequest.suppressOutgoingDamage;
+    public bool IsHealthDepleted => _damageReceiver != null && _damageReceiver.Health.IsDepleted;
+    public float CurrentHealth => _damageReceiver != null ? _damageReceiver.Health.Current : 0f;
+    public float MaxHealth => _damageReceiver != null ? _damageReceiver.Health.Max : 0f;
+    public NavMeshAgent TutorialAgent => _agent;
+    public event Action<PostStudent, ScriptedBehaviorRequest, TutorialBehaviorTelemetry> ScriptedBehaviorTelemetryEvent;
+    public event Action<PostStudent> TutorialStandUpCompletedEvent;
 
 
     public MonitorSpot SeatSpot {  get; set; }
@@ -117,20 +155,36 @@ public class PostStudent : MonoBehaviour
 
     private void Start()
     {
+        InitializeSharedRuntimeIfNeeded();
+    }
+
+
+
+    private void InitializeSharedRuntimeIfNeeded()
+    {
+        if (_sharedRuntimeInitialized) return;
+        if (BehaviorWeightSet == null)
+        {
+            Debug.LogError($"[{name}] BehaviorWeightSet 참조가 ?�습?�다.", this);
+            return;
+        }
+
         _agent.stoppingDistance = 0.1f;
         BehaviorWeightSet = BehaviorWeightSet.CreateDeepCopy();
-        BehaviorWeightSet.ModifyChance(BehaviorType.Escape, AttributeSystem.Instance.StudEscapeChanceMod.GetFinalValue());
+        if (!_isInitializingTutorialRuntime)
+            BehaviorWeightSet.ModifyChance(BehaviorType.Escape, AttributeSystem.Instance.StudEscapeChanceMod.GetFinalValue());
         HideAllAnimAttachments();
         StopAllOverlapAttackers();
         _characterRagdoll.UnTriggerRagdoll();
         _speedSelector = ConstructSpeedSelector();
-        _boostReceiver.CanEffectChecker = () => _root != null && _blackboard != null && (_blackboard.targetObject == null && (_blackboard.destBehavior != BehaviorType.Escape ||_anim.GetLayerWeight(STRIKE_LAYER_INDEX) < 0.5f));
-        _damageReceiver.CanEffectChecker = () => _blackboard != null && _blackboard.isEscaping == false;
+        _boostReceiver.CanEffectChecker = CanReceiveBoostByAllRules;
+        _damageReceiver.CanEffectChecker = CanReceiveDamageByAllRules;
         _moveSpeedModifier = AttributeSystem.Instance.StudMoveSpeedMod;
         _anim.SetFloat("MoveSpeedScale", _moveSpeedModifier.GetFinalValue());
         _characterCollider.enabled = false;
         Invoke(nameof(PlaySleepingSFX), UnityEngine.Random.Range(0.5f, 2f));
         _anim.SetBool("Laying", true);
+        _sharedRuntimeInitialized = true;
     }
 
 
@@ -153,6 +207,36 @@ public class PostStudent : MonoBehaviour
 
     private void StartBehavior()
     {
+        CreateBehaviorRuntime();
+    }
+
+
+
+    private void Update()
+    {
+        // ?�재 ?�이?�트???�제 ?�도�??�니메이?�에 ?�달 (보폭 맞추�?
+        // Magnitude�??�용?�면 방향�??��??�이 ?�제 ?�동 ?�도가 ?�달?�니??
+        //_anim.SetFloat("MoveSpeed", _agent.velocity.magnitude, 0.1f, Time.deltaTime);
+        //if (_hitReceiver.IsDead)
+        //{
+        //    Debug.Log("Die!!");
+        //}
+        if (_root != null && ShouldEvaluateBehaviorTree())
+        {
+            if (_tutorialBehaviorRuntimeInitialized && _hasScriptedBehaviorRequest && _scriptedBehaviorRequest.holdUntilResolved)
+            {
+                _blackboard.isForceBehavior = true;
+                _blackboard.destBehavior = _scriptedBehaviorRequest.behavior;
+                _blackboard.useAssignedSpot = _scriptedBehaviorRequest.fixedSpot != null;
+            }
+            _root.Evaluate();
+        }
+    }
+
+
+
+    private void CreateBehaviorRuntime()
+    {
         _characterCollider.enabled = true;
         _blackboard = new Blackboard(gameObject, BehaviorWeightSet, _stageSpots, _player.gameObject);
         _blackboard.EscapeSuccessEvent.AddListener(OnEscaped);
@@ -162,31 +246,57 @@ public class PostStudent : MonoBehaviour
 
 
 
-    private void Update()
+    private bool ShouldEvaluateBehaviorTree()
     {
-        // 현재 에이전트의 실제 속도를 애니메이터에 전달 (보폭 맞추기)
-        // Magnitude를 사용하면 방향과 상관없이 실제 이동 속도가 전달됩니다.
-        //_anim.SetFloat("MoveSpeed", _agent.velocity.magnitude, 0.1f, Time.deltaTime);
-        //if (_hitReceiver.IsDead)
-        //{
-        //    Debug.Log("Die!!");
-        //}
-        if (_root != null)
-        {
-            _root.Evaluate();
-        }
+        if (!_tutorialBehaviorRuntimeInitialized) return true;
+        if (_tutorialMode == TutorialStudentMode.MiniWave) return true;
+        return _tutorialMode == TutorialStudentMode.Training
+            && (_hasScriptedBehaviorRequest
+                || (_blackboard != null
+                    && (_blackboard.hasToWork
+                        || (_blackboard.isForceBehavior
+                            && _blackboard.destBehavior == BehaviorType.Work))));
+    }
+
+
+
+    private bool CanReceiveBoostByAllRules()
+    {
+        bool normalRules = _root != null
+            && _blackboard != null
+            && _blackboard.targetObject == null
+            && (_blackboard.destBehavior != BehaviorType.Escape
+                || _anim.GetLayerWeight(STRIKE_LAYER_INDEX) < 0.5f);
+        bool tutorialRules = !_tutorialBehaviorRuntimeInitialized
+            || (!_tutorialBoostBlocked
+                && ((_tutorialMode == TutorialStudentMode.Training
+                        && (!_hasScriptedBehaviorRequest || _scriptedActionStartedReported))
+                    || _tutorialMode == TutorialStudentMode.MiniWave));
+        return normalRules && tutorialRules;
+    }
+
+
+
+    private bool CanReceiveDamageByAllRules()
+    {
+        bool normalRules = _blackboard != null && !_blackboard.isEscaping;
+        bool tutorialRules = !_tutorialBehaviorRuntimeInitialized
+            || (_tutorialMode == TutorialStudentMode.Training
+                && (!_hasScriptedBehaviorRequest || _scriptedActionStartedReported))
+            || _tutorialMode == TutorialStudentMode.MiniWave;
+        return normalRules && tutorialRules;
     }
 
 
 
     //void OnAnimatorMove()
     //{
-    //    // 1. 현재 프레임에서 애니메이션이 이동해야 할 거리(Delta)를 가져옴
-    //    // 2. 여기에 사용자가 원하는 % (multiplier)를 곱함
+    //    // 1. ?�재 ?�레?�에???�니메이?�이 ?�동?�야 ??거리(Delta)�?가?�옴
+    //    // 2. ?�기???�용?��? ?�하??% (multiplier)�?곱함
     //    Vector3 desiredVelocity = (_anim.deltaPosition / Time.deltaTime);// * movementMultiplier;
 
-    //    // 3. 에이전트에게 "이 속도로 움직여라"라고 직접 명령
-    //    // 이렇게 하면 애니메이션 재생 속도에 맞춰 에이전트가 움직이므로 싱크가 절대 깨지지 않음
+    //    // 3. ?�이?�트?�게 "???�도�??�직여???�고 직접 명령
+    //    // ?�렇�??�면 ?�니메이???�생 ?�도??맞춰 ?�이?�트가 ?�직이므�??�크가 ?��? 깨�?지 ?�음
     //    _agent.velocity = desiredVelocity;
     //}
 
@@ -194,6 +304,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnWorkTriggered()
     {
+        if (_blackboard == null || (_tutorialBehaviorRuntimeInitialized && _tutorialBoostBlocked)) return;
         if (_blackboard.isEscaping) return;
         Debug.Log("OnWorkTriggered");
         _blackboard.isForceBehavior = false;
@@ -204,6 +315,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnFrenzyTriggered()
     {
+        if (_blackboard == null || (_tutorialBehaviorRuntimeInitialized && _tutorialBoostBlocked)) return;
         if (_blackboard.isEscaping) return;
         Debug.Log("OnFrenzyTriggered");
         _blackboard.hasToFrenzy = true;
@@ -245,9 +357,9 @@ public class PostStudent : MonoBehaviour
                 new SetSpeed(() => _fastRunSpeed),
                 new SetSpeed(() => _sprintSpeed),
             },
-            new List<System.Func<float>> { 
-                () => 40, // Walk 확률 40%
-                () => 25, // Jog 확률 25%
+            new List<System.Func<float>> {
+                () => 40, // Walk ?�률 40%
+                () => 25, // Jog ?�률 25%
                 () => 15, // SlowRun 15%
                 () => 10, // MedRun 10%
                 () => 7,  // FastRun 7%
@@ -273,26 +385,26 @@ public class PostStudent : MonoBehaviour
 
     //private BT_Node ConstructWorkSequence()
     //{
-    //    // 1. 개별 액션 시퀀스 정의
+    //    // 1. 개별 ?�션 ?�퀀???�의
     //    Sequence angrySeq = new Sequence(new List<BT_Node> { new PlayOnceAnim("Angry", "Angry", 1) });
     //    Sequence clapSeq = new Sequence(new List<BT_Node> { new PlayOnceAnim("Clap", "Clap", 1) });
     //    Sequence frustrateSeq = new Sequence(new List<BT_Node> { new PlayOnceAnim("Frustrated", "Frustrated", 1) });
 
-    //    // 2. 아무것도 안 하고 타이핑만 계속할 상태 (대기 노드)
+    //    // 2. ?�무것도 ???�고 ?�?�핑�?계속???�태 (?��??�드)
     //    Sequence justTyping = new Sequence(new List<BT_Node> { new Delay(() => 0.1f) });
 
-    //    // 3. 확률 선택기 구성 (가중치 부여)
+    //    // 3. ?�률 ?�택�?구성 (가중치 부??
     //    RandomSelector chanceActionSelector = new RandomSelector(
     //        new List<BT_Node> { angrySeq, clapSeq, frustrateSeq, justTyping },
     //        new List<System.Func<int>> {
-    //            () => 10, // 욕(분노) 10%
+    //            () => 10, // ??분노) 10%
     //            () => 10, // 박수 10%
     //            () => 10, // 좌절 10%
-    //            () => 1  // 그냥 계속 타이핑 70%
+    //            () => 1  // 그냥 계속 ?�?�핑 70%
     //        }
     //    );
 
-    //    // 4. 메인 워크 시퀀스에 조립
+    //    // 4. 메인 ?�크 ?�퀀?�에 조립
     //    Sequence workSequence = new Sequence(new List<BT_Node>
     //    {
     //        //new SetBehaveSpot(_chairSpot),
@@ -312,10 +424,10 @@ public class PostStudent : MonoBehaviour
 
     private BT_Node ConstructBehaviorTree()
     {
-        // 동작 설계: 
-        // 1. 랜덤 지점으로 이동
-        // 2. 도착하면 3초간 주변 구경(Loop)
-        // 3. 50% 확률로 기지개 켜기(Once), 50% 확률로 그냥 대기
+        // ?�작 ?�계:
+        // 1. ?�덤 지?�으�??�동
+        // 2. ?�착?�면 3초간 주�? 구경(Loop)
+        // 3. 50% ?�률�?기�?�?켜기(Once), 50% ?�률�?그냥 ?��?
         Sequence prowlSequence = new Sequence(new List<BT_Node>
         {
             //new SetRandomBehaveSpot(_prowlSpots),
@@ -383,7 +495,7 @@ public class PostStudent : MonoBehaviour
         BT_Node combatSubTree = new Sequence(new List<BT_Node>
         {
             new SetAttackTarget(() => _player.gameObject),
-            // 1. 적에게 접근 (사거리 안에 들어올 때까지 Running, 들어오면 Success)
+            // 1. ?�에�??�근 (?�거�??�에 ?�어???�까지 Running, ?�어?�면 Success)
             new ParallelNode(new List<BT_Node>
             {
                 new CombatApproachPattern(),
@@ -400,11 +512,11 @@ public class PostStudent : MonoBehaviour
             //     }),
             //     new MeleeAttackPattern(),
             // }),
-            
-            // 2. 사거리 안에서 무작위 공격 수행 (애니메이션 끝날 때까지 Running)
+
+            // 2. ?�거�??�에??무작??공격 ?�행 (?�니메이???�날 ?�까지 Running)
             //new MeleeAttackPattern(),
-            
-            // 3. 공격 후 잠깐의 틈 (AI가 너무 숨 가쁘게 공격하지 않도록)
+
+            // 3. 공격 ???�깐????(AI가 ?�무 ??가?�게 공격?��? ?�도�?
         });
 
         //return combatSubTree;
@@ -425,7 +537,7 @@ public class PostStudent : MonoBehaviour
         //});
 
         //return ConstructCombatSequence();
-        // 4. 전체 루트를 반복(Selector 또는 Sequence) 하도록 설정
+        // 4. ?�체 루트�?반복(Selector ?�는 Sequence) ?�도�??�정
 
         //return new Selector(new List<BT_Node> { randomJobSelector });
 
@@ -546,14 +658,14 @@ public class PostStudent : MonoBehaviour
 
         Selector jopBehavior = new Selector(new List<BT_Node>
         {
-            // 1. 무한 반복해야 하는 특정 비헤이비어 체크
-            //new ConditionDecorator(() => _blackboard.destBehavior == BehaviorType.Escape, 
-            //    // 여기에 초기화가 필요 없는 루프 로직 배치
+            // 1. 무한 반복?�야 ?�는 ?�정 비헤?�비??체크
+            //new ConditionDecorator(() => _blackboard.destBehavior == BehaviorType.Escape,
+            //    // ?�기??초기?��? ?�요 ?�는 루프 로직 배치
             //    behaviorNodes[BehaviorType.Escape]
             //),
 
-            new ConditionDecorator(() => _blackboard.destBehavior == BehaviorType.Tackle, 
-                // 여기에 초기화가 필요 없는 루프 로직 배치
+            new ConditionDecorator(() => _blackboard.destBehavior == BehaviorType.Tackle,
+                // ?�기??초기?��? ?�요 ?�는 루프 로직 배치
                 new Sequence(new List<BT_Node>
                 {
                     new ActionNode(HideAllAnimAttachments),
@@ -566,7 +678,7 @@ public class PostStudent : MonoBehaviour
                 })
             ),
 
-            // 2. 일반적인 비헤이비어 (매번 초기화가 필요한 그룹)
+            // 2. ?�반?�인 비헤?�비??(매번 초기?��? ?�요??그룹)
             new Sequence(new List<BT_Node>
             {
                 //new SetRandomBehavior(),
@@ -591,7 +703,7 @@ public class PostStudent : MonoBehaviour
         {
         new Selector(new List<BT_Node>
             {
-                // 강제 모드면 아무것도 안 하고 바로 Success (이미 결정된 행동 유지)
+                // 강제 모드�??�무것도 ???�고 바로 Success (?��? 결정???�동 ?��?)
                 new ConditionDecorator(() => _blackboard.isForceBehavior == true && _blackboard.destBehavior != BehaviorType.None,
                     new ActionNode(null, NodeState.Success)),
                 new SetRandomBehavior()
@@ -614,8 +726,576 @@ public class PostStudent : MonoBehaviour
 
 
 
+    public bool InitializeTutorialBehaviorRuntime(TutorialBehaviorRuntimeContext context)
+    {
+        if (_tutorialBehaviorRuntimeInitialized)
+        {
+            Debug.LogWarning($"[{name}] ?�토리얼 ?�동 runtime?� ?�생마다 ??번만 초기?�할 ???�습?�다.", this);
+            return false;
+        }
+        if (context.player == null || context.stageSpots == null || context.behaviorWeightSet == null)
+        {
+            Debug.LogError($"[{name}] ?�토리얼 ?�동 runtime ?�수 참조가 ?�락?�습?�다.", this);
+            return false;
+        }
+
+        _player = context.player;
+        _stageSpots = context.stageSpots;
+        BehaviorWeightSet = context.behaviorWeightSet;
+        _isInitializingTutorialRuntime = true;
+        InitializeSharedRuntimeIfNeeded();
+        _isInitializingTutorialRuntime = false;
+        if (!_sharedRuntimeInitialized) return false;
+
+        CancelInvoke(nameof(PlaySleepingSFX));
+        _soundBehavior.StopSleeping();
+        _anim.SetBool("Laying", false);
+        CreateBehaviorRuntime();
+        _tutorialBehaviorRuntimeInitialized = true;
+        SetTutorialMode(TutorialStudentMode.Standby);
+        return true;
+    }
+
+
+
+    public bool ResetTutorialBehaviorRuntime(TutorialStudentResetState state)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized)
+        {
+            Debug.LogError($"[{name}] 초기?�되지 ?��? ?�토리얼 ?�동 runtime?� reset?????�습?�다.", this);
+            return false;
+        }
+
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
+
+        if (_hasScriptedBehaviorRequest)
+            CancelScriptedBehaviorInternal(false);
+        else
+            CleanupCurrentBehaviorRuntime();
+        _root?.Reset();
+        _root = null;
+        if (state.behaviorWeightSet != null)
+            BehaviorWeightSet = state.behaviorWeightSet.CreateDeepCopy();
+
+        _characterRagdoll.RestoreAutoStandUpRuntimeOverride();
+        if (!state.autoStandUp)
+            _characterRagdoll.SetAutoStandUpRuntimeOverride(false);
+        _characterRagdoll.UnTriggerRagdoll();
+        _damageReceiver.Health.Initialize(true);
+        _damageReceiver.Health.Increase(Mathf.Clamp(state.health, 0f, _damageReceiver.Health.Max));
+        _tutorialBoostBlocked = state.boostBlocked;
+        ResetTutorialAnimationAndAttachments();
+
+        if (!_agent.enabled) _agent.enabled = true;
+        WarpForTutorial(state.position, state.rotation);
+        _agent.updatePosition = true;
+        _agent.updateRotation = true;
+        _characterCollider.enabled = true;
+
+        CreateBehaviorRuntime();
+        SetTutorialMode(state.mode);
+        return true;
+    }
+
+
+
+    public TutorialStudentResetState CaptureTutorialResetState()
+    {
+        return new TutorialStudentResetState
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            mode = _tutorialMode,
+            health = CurrentHealth,
+            autoStandUp = _characterRagdoll.IsAutoStandUpEnabled,
+            boostBlocked = _tutorialBoostBlocked,
+            behaviorWeightSet = BehaviorWeightSet,
+        };
+    }
+
+
+
+    public void SetTutorialMode(TutorialStudentMode mode)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        if (_tutorialMode == TutorialStudentMode.Cheer && mode != TutorialStudentMode.Cheer)
+            StopTutorialCheerAnimation(true);
+        if (mode != TutorialStudentMode.Training && mode != TutorialStudentMode.MiniWave)
+        {
+            if (_hasScriptedBehaviorRequest)
+                CancelScriptedBehaviorInternal(true);
+            else if (_tutorialMode == TutorialStudentMode.Training || _tutorialMode == TutorialStudentMode.MiniWave)
+                CleanupCurrentBehaviorRuntime();
+        }
+        _tutorialMode = mode;
+        bool isActive = mode == TutorialStudentMode.Training || mode == TutorialStudentMode.MiniWave;
+        _characterCollider.enabled = isActive;
+        if (!isActive)
+        {
+            StopAllOverlapAttackers();
+            if (_agent.enabled && _agent.isOnNavMesh)
+            {
+                _agent.ResetPath();
+                _agent.velocity = Vector3.zero;
+            }
+            _anim.SetFloat("MoveSpeed", 0f);
+        }
+    }
+
+
+
+    public bool BeginScriptedBehavior(ScriptedBehaviorRequest request)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized || _tutorialMode != TutorialStudentMode.Training)
+            return false;
+        if (string.IsNullOrWhiteSpace(request.scenarioId)
+            || request.behavior == BehaviorType.None
+            || request.fixedSpot == null)
+        {
+            Debug.LogError($"[{name}] scripted behavior ?�청??ID, ?�동 ?�는 spot???�락?�습?�다.", this);
+            return false;
+        }
+
+        CancelScriptedBehaviorInternal(false);
+        _scriptedBehaviorRequest = request;
+        _hasScriptedBehaviorRequest = true;
+        _scriptedActionStartedReported = false;
+        _blackboard.prevBehavior = _blackboard.destBehavior;
+        _blackboard.destBehavior = request.behavior;
+        _blackboard.destSpot = request.fixedSpot;
+        _blackboard.destPosition = request.fixedSpot.transform.position;
+        _blackboard.isForceBehavior = true;
+        _blackboard.useAssignedSpot = true;
+        request.fixedSpot.Use(this);
+        if (request.overrideSongQuality)
+            _singAttacher?.SetTutorialSongQuality(request.useBadSong);
+        _root?.Reset();
+        ScriptedBehaviorTelemetryEvent?.Invoke(this, request, TutorialBehaviorTelemetry.Selected);
+        return true;
+    }
+
+
+
+    public bool ResolveScriptedBehavior(string scenarioId)
+    {
+        if (!_hasScriptedBehaviorRequest || _scriptedBehaviorRequest.scenarioId != scenarioId)
+            return false;
+        ScriptedBehaviorRequest completed = _scriptedBehaviorRequest;
+        CancelScriptedBehaviorInternal(false);
+        ScriptedBehaviorTelemetryEvent?.Invoke(this, completed, TutorialBehaviorTelemetry.Completed);
+        return true;
+    }
+
+
+
+    public bool CancelScriptedBehavior(string scenarioId)
+    {
+        if (!_hasScriptedBehaviorRequest || _scriptedBehaviorRequest.scenarioId != scenarioId)
+            return false;
+        return CancelScriptedBehaviorInternal(true);
+    }
+
+
+
+    private bool CancelScriptedBehaviorInternal(bool reportInterrupted)
+    {
+        if (!_hasScriptedBehaviorRequest) return false;
+        DOTween.Kill(this);
+        ScriptedBehaviorRequest cancelled = _scriptedBehaviorRequest;
+        _blackboard?.destSpot?.Release(this);
+        if (_blackboard != null)
+        {
+            _blackboard.SecadeCoop();
+            _blackboard.SecadeCoop2();
+            _blackboard.destSpot = null;
+            _blackboard.destBehavior = BehaviorType.None;
+            _blackboard.targetDamageable = null;
+            _blackboard.targetObject = null;
+            _blackboard.hasToWork = false;
+            _blackboard.hasToFrenzy = false;
+            _blackboard.isForceBehavior = false;
+            _blackboard.useAssignedSpot = false;
+        }
+        _root?.Reset();
+        _singAttacher?.ClearTutorialSongQuality();
+        ResetTutorialAnimationAndAttachments();
+        _hasScriptedBehaviorRequest = false;
+        _scriptedActionStartedReported = false;
+        _scriptedBehaviorRequest = default;
+        if (reportInterrupted)
+            ScriptedBehaviorTelemetryEvent?.Invoke(this, cancelled, TutorialBehaviorTelemetry.Interrupted);
+        return true;
+    }
+
+
+
+    private void CleanupCurrentBehaviorRuntime()
+    {
+        DOTween.Kill(this);
+        if (_blackboard != null)
+        {
+            _blackboard.destSpot?.Release(this);
+            _blackboard.SecadeCoop();
+            _blackboard.SecadeCoop2();
+            _blackboard.destSpot = null;
+            _blackboard.destBehavior = BehaviorType.None;
+            _blackboard.targetDamageable = null;
+            _blackboard.targetObject = null;
+            _blackboard.hasToWork = false;
+            _blackboard.hasToFrenzy = false;
+            _blackboard.isForceBehavior = false;
+            _blackboard.useAssignedSpot = false;
+            _blackboard.isEscaping = false;
+        }
+        _root?.Reset();
+        ResetTutorialAnimationAndAttachments();
+    }
+
+
+
+    public void NotifyTutorialBehaviorActionStarted()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized
+            || !_hasScriptedBehaviorRequest
+            || _scriptedActionStartedReported)
+            return;
+        _scriptedActionStartedReported = true;
+        ScriptedBehaviorTelemetryEvent?.Invoke(
+            this,
+            _scriptedBehaviorRequest,
+            TutorialBehaviorTelemetry.ActionStarted);
+    }
+
+
+
+    public void SetTutorialBoostBlocked(bool isBlocked)
+    {
+        if (_tutorialBehaviorRuntimeInitialized)
+            _tutorialBoostBlocked = isBlocked;
+    }
+
+
+
+    public bool PrepareTutorialBoostedWorkSpot(BehaveSpot spot)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized
+            || _tutorialMode != TutorialStudentMode.Training
+            || spot == null
+            || !spot.HasBehavior(BehaviorType.Work)
+            || !spot.IsUsable)
+            return false;
+
+        _blackboard.destSpot?.Release(this);
+        _blackboard.destSpot = spot;
+        _blackboard.destPosition = spot.transform.position;
+        _blackboard.useAssignedSpot = true;
+        spot.Use(this);
+        return true;
+    }
+
+
+
+    public void SetTutorialAutoStandUp(bool isEnabled)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        _characterRagdoll.SetAutoStandUpRuntimeOverride(isEnabled);
+    }
+
+
+
+    public void RestoreTutorialAutoStandUp()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        _characterRagdoll.RestoreAutoStandUpRuntimeOverride();
+    }
+
+
+
+    public void ForceStopTutorialWork()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        if (_hasScriptedBehaviorRequest && _scriptedBehaviorRequest.behavior == BehaviorType.Work)
+            CancelScriptedBehaviorInternal(true);
+        if (_blackboard != null)
+        {
+            _blackboard.destSpot?.Release(this);
+            _blackboard.SecadeCoop();
+            _blackboard.SecadeCoop2();
+            _blackboard.destSpot = null;
+            _blackboard.hasToWork = false;
+            if (_blackboard.destBehavior == BehaviorType.Work)
+                _blackboard.destBehavior = BehaviorType.None;
+            _blackboard.isForceBehavior = false;
+            _blackboard.useAssignedSpot = false;
+        }
+        _root?.Reset();
+        _anim.SetBool("Typing", false);
+        _anim.SetBool("Sitting", false);
+    }
+
+
+
+    public void StartTutorialMiniWave(BehaviorWeightSet miniWaveWeights)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized || miniWaveWeights == null) return;
+        CancelScriptedBehaviorInternal(false);
+        _root = null;
+        BehaviorWeightSet = miniWaveWeights.CreateDeepCopy();
+        CreateBehaviorRuntime();
+        SetTutorialMode(TutorialStudentMode.MiniWave);
+    }
+
+
+
+    public bool WarpForTutorial(Vector3 position, Quaternion rotation)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return false;
+        if (!NavMesh.SamplePosition(position, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+        {
+            transform.SetPositionAndRotation(position, rotation);
+            return false;
+        }
+        transform.SetPositionAndRotation(hit.position, rotation);
+        if (!_agent.enabled) _agent.enabled = true;
+        return _agent.Warp(hit.position) && _agent.isOnNavMesh;
+    }
+
+
+
+    public bool TryRecoverTutorialAgentOnNavMesh(Vector3 returnTarget)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized || !isActiveAndEnabled || _agent == null)
+            return false;
+        if (!NavMesh.SamplePosition(returnTarget, out NavMeshHit targetHit, 5f, NavMesh.AllAreas))
+            return false;
+
+        NavMeshPath path = new();
+        if (_agent.enabled
+            && _agent.isOnNavMesh
+            && NavMesh.CalculatePath(transform.position, targetHit.position, NavMesh.AllAreas, path)
+            && path.status == NavMeshPathStatus.PathComplete)
+            return true;
+
+        Vector3 recoveryOrigin = transform.position;
+        float searchRadius = 2f;
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            if (NavMesh.SamplePosition(recoveryOrigin, out NavMeshHit recoveryHit, searchRadius, NavMesh.AllAreas)
+                && NavMesh.CalculatePath(recoveryHit.position, targetHit.position, NavMesh.AllAreas, path)
+                && path.status == NavMeshPathStatus.PathComplete
+                && TryPlaceTutorialAgentOnNavMesh(recoveryHit.position))
+                return true;
+            searchRadius += 4f;
+        }
+
+        return TryPlaceTutorialAgentOnNavMesh(targetHit.position);
+    }
+
+
+
+    private bool TryPlaceTutorialAgentOnNavMesh(Vector3 position)
+    {
+        if (_agent.enabled && _agent.isOnNavMesh)
+            _agent.ResetPath();
+        transform.position = position;
+        if (!_agent.enabled) _agent.enabled = true;
+        return _agent.Warp(position) && _agent.isOnNavMesh;
+    }
+
+
+
+    public bool MoveForTutorial(Vector3 destination, float speed)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized || !_agent.enabled || !_agent.isOnNavMesh)
+            return false;
+        _agent.updatePosition = true;
+        _agent.updateRotation = true;
+        _agent.speed = speed;
+        bool pathStarted = _agent.SetDestination(destination);
+        _anim.SetFloat("MoveSpeed", pathStarted ? speed : 0f);
+        return pathStarted;
+    }
+
+
+
+    public void StopTutorialMovementAnimation()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        _anim.SetFloat("MoveSpeed", 0f);
+    }
+
+
+
+    public bool StartTutorialCheer()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized
+            || _tutorialMode != TutorialStudentMode.Cheer
+            || IsHealthDepleted
+            || !isActiveAndEnabled)
+            return false;
+
+        foreach (string triggerName in _tutorialCheerTriggerPool)
+        {
+            if (HasAnimatorParameter(triggerName, AnimatorControllerParameterType.Trigger))
+                continue;
+            Debug.LogError($"[{name}] Arena ?�원 Trigger '{triggerName}'가 Animator???�습?�다.", this);
+            return false;
+        }
+
+        ResetTutorialAnimationAndAttachments();
+        _tutorialCheerCoroutine = StartCoroutine(TutorialCheerRoutine());
+        return true;
+    }
+
+
+
+    public void StopTutorialCheer() => StopTutorialCheerAnimation(true);
+
+
+
+    private IEnumerator TutorialCheerRoutine()
+    {
+        while (_tutorialMode == TutorialStudentMode.Cheer && !IsHealthDepleted)
+        {
+            while (_anim.IsInTransition(0)
+                && _tutorialMode == TutorialStudentMode.Cheer
+                && !IsHealthDepleted)
+                yield return null;
+
+            if (_tutorialMode != TutorialStudentMode.Cheer || IsHealthDepleted)
+                break;
+
+            string triggerName = _tutorialCheerTriggerPool[
+                UnityEngine.Random.Range(0, _tutorialCheerTriggerPool.Length)];
+            _anim.SetTrigger(triggerName);
+            bool enteredState = false;
+
+            while (_tutorialMode == TutorialStudentMode.Cheer && !IsHealthDepleted)
+            {
+                AnimatorStateInfo stateInfo = _anim.GetCurrentAnimatorStateInfo(0);
+                bool isTargetState = stateInfo.IsName(triggerName)
+                    || stateInfo.IsName("Base Layer." + triggerName);
+                if (isTargetState)
+                {
+                    enteredState = true;
+                    if (stateInfo.normalizedTime >= 0.95f)
+                        break;
+                }
+                else if (enteredState && !_anim.IsInTransition(0))
+                {
+                    break;
+                }
+                yield return null;
+            }
+
+            _anim.ResetTrigger(triggerName);
+            yield return null;
+        }
+
+        _tutorialCheerCoroutine = null;
+    }
+
+
+
+    private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType parameterType)
+    {
+        foreach (AnimatorControllerParameter parameter in _anim.parameters)
+        {
+            if (parameter.type == parameterType && parameter.name == parameterName)
+                return true;
+        }
+        return false;
+    }
+
+
+
+    private void StopTutorialCheerAnimation(bool returnToIdle)
+    {
+        bool wasRunning = _tutorialCheerCoroutine != null;
+        if (_tutorialCheerCoroutine != null)
+        {
+            StopCoroutine(_tutorialCheerCoroutine);
+            _tutorialCheerCoroutine = null;
+        }
+        foreach (string triggerName in _tutorialCheerTriggerPool)
+            _anim.ResetTrigger(triggerName);
+        if (wasRunning && returnToIdle && _anim.enabled && gameObject.activeInHierarchy)
+            _anim.CrossFade("Locomotion", 0.1f, 0);
+    }
+
+
+
+    public void ApplyTutorialPose(string animatorBool)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized) return;
+        ResetTutorialAnimationAndAttachments();
+        if (string.IsNullOrWhiteSpace(animatorBool)) return;
+        foreach (AnimatorControllerParameter parameter in _anim.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Bool && parameter.name == animatorBool)
+            {
+                _anim.SetBool(animatorBool, true);
+                return;
+            }
+        }
+        Debug.LogError($"[{name}] Animator bool '{animatorBool}'???�습?�다.", this);
+    }
+
+
+
+    public bool ShowTutorialFood(GameObject foodSource)
+    {
+        if (!_tutorialBehaviorRuntimeInitialized
+            || _tutorialMode != TutorialStudentMode.Standby
+            || _plateAttacher == null
+            || foodSource == null)
+            return false;
+
+        if (!_plateAttacher.ShowTutorialFood(foodSource))
+            return false;
+
+        _anim.SetBool("Carrying", true);
+        return true;
+    }
+
+
+
+    public void ClearTutorialFood()
+    {
+        if (!_tutorialBehaviorRuntimeInitialized || _plateAttacher == null) return;
+        _anim.SetBool("Carrying", false);
+        _plateAttacher.ClearTutorialFood();
+    }
+
+
+
+    private void ResetTutorialAnimationAndAttachments()
+    {
+        StopTutorialCheerAnimation(false);
+        StopAllOverlapAttackers();
+        HideAllAnimAttachments();
+        _anim.applyRootMotion = false;
+        if (!_anim.enabled) _anim.enabled = true;
+        foreach (AnimatorControllerParameter parameter in _anim.parameters)
+        {
+            switch (parameter.type)
+            {
+                case AnimatorControllerParameterType.Bool:
+                    _anim.SetBool(parameter.nameHash, false);
+                    break;
+                case AnimatorControllerParameterType.Trigger:
+                    _anim.ResetTrigger(parameter.nameHash);
+                    break;
+            }
+        }
+        _anim.SetFloat("MoveSpeed", 0f);
+    }
+
+
+
     public void UnFocusProfessorAttack()
     {
+        if (_blackboard == null || _player == null) return;
         if (_blackboard.targetObject != _player.gameObject) return;
         _blackboard.targetObject = null;
         _blackboard.targetDamageable = null;
@@ -636,7 +1316,7 @@ public class PostStudent : MonoBehaviour
     //    _agent = GetComponent<NavMeshAgent>();
     //    _anim = GetComponent<Animator>();
 
-    //    // 가속도를 높여야 속도 변화가 즉각적으로 보입니다.
+    //    // 가?�도�??�여???�도 변?��? 즉각?�으�?보입?�다.
     //    _agent.acceleration = 30f;
     //}
 
@@ -653,24 +1333,24 @@ public class PostStudent : MonoBehaviour
     {
         while (true)
         {
-            // 1단계: 정지
-            // UpdateState("정지", _idleSpeed);
+            // 1?�계: ?��?
+            // UpdateState("?��?", _idleSpeed);
             // yield return new WaitForSeconds(_changeInterval);
 
-            // 2단계: 걷기
+            // 2?�계: 걷기
             // UpdateState("걷기", _walkSpeed);
             // yield return new WaitForSeconds(_changeInterval);
 
-            // 3단계: 조깅
+            // 3?�계: 조깅
             //UpdateState("조깅", _jogSpeed);
             //yield return new WaitForSeconds(_changeInterval);
 
-            // 4단계: 뛰기
-            // UpdateState("뛰기", _runSpeed);
+            // 4?�계: ?�기
+            // UpdateState("?�기", _runSpeed);
             // yield return new WaitForSeconds(_changeInterval);
 
-            // 5단계: 전력질주
-            // UpdateState("전력질주", _sprintSpeed);
+            // 5?�계: ?�력질주
+            // UpdateState("?�력질주", _sprintSpeed);
             // yield return new WaitForSeconds(_changeInterval);
         }
     }
@@ -678,7 +1358,7 @@ public class PostStudent : MonoBehaviour
     private void UpdateState(string stateName, float speed)
     {
         _agent.speed = speed;
-        Debug.Log($"현재 상태: {stateName} (속도: {speed})");
+        Debug.Log($"?�재 ?�태: {stateName} (?�도: {speed})");
     }
 
 
@@ -692,7 +1372,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnDamaged(Vector3 hitPoint, Quaternion hitRotation, float impulse, GameObject killer)
     {
-        
+
     }
 
 
@@ -703,6 +1383,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnDamaged(HitInfo hitInfo, float hitAmount)
     {
+        if (_blackboard == null) return;
         _blackboard.isDamaged = true;
         _blackboard.isStunned = true;
         if (hitAmount > 0f && _player != null && hitInfo.attacker == _player.gameObject && !_damageReceiver.Health.IsDepleted)
@@ -726,6 +1407,7 @@ public class PostStudent : MonoBehaviour
 
     public void OnEscaped()
     {
+        if (SuppressScriptedWorldConsequences) return;
         EscapeEvent?.Invoke(this);
         _blackboard.destSpot?.Release(this);
         gameObject.SetActive(false);
@@ -786,18 +1468,26 @@ public class PostStudent : MonoBehaviour
 
     private void OnStandUpComplete()
     {
-        _agent.updatePosition = true;    // 에이전트가 트랜스폼을 움직이도록 허용
-        _agent.updateRotation = true;    // 회전도 허용
+        _agent.updatePosition = true;    // ?�이?�트가 ?�랜?�폼???�직이?�록 ?�용
+        _agent.updateRotation = true;    // ?�전???�용
         _anim.applyRootMotion = false;
         _anim.SetFloat("MoveSpeedScale", _moveSpeedModifier.GetFinalValue());
-        _blackboard = new Blackboard(gameObject, BehaviorWeightSet, _stageSpots, _player.gameObject);
-        _root = ConstructBehaviorTree();
-        _root.SetBlackboard(_blackboard);
-        OnWorkTriggered();
+        if (_tutorialBehaviorRuntimeInitialized)
+        {
+            CreateBehaviorRuntime();
+            TutorialStandUpCompletedEvent?.Invoke(this);
+        }
+        else
+        {
+            _blackboard = new Blackboard(gameObject, BehaviorWeightSet, _stageSpots, _player.gameObject);
+            _root = ConstructBehaviorTree();
+            _root.SetBlackboard(_blackboard);
+            OnWorkTriggered();
+        }
     }
 
 
-    //이전
+    //?�전
     //private void SetRagdoll(bool isActive)
     //{
     //    _anim.enabled = !isActive;
@@ -805,7 +1495,7 @@ public class PostStudent : MonoBehaviour
 
     //    if (TryGetComponent(out Rigidbody rootRb))
     //    {
-    //        //rootRb.isKinematic = isActive; // 래그돌이면 본체 물리 연산 중단
+    //        //rootRb.isKinematic = isActive; // ?�그?�이�?본체 물리 ?�산 중단
     //        rootRb.useGravity = !isActive;
     //    }
 
@@ -832,13 +1522,13 @@ public class PostStudent : MonoBehaviour
         _anim.enabled = false;
         _characterCollider.enabled = false;
 
-        // 래그돌 부위들을 찾아 물리 적용
+        // ?�그??부?�들??찾아 물리 ?�용
         foreach (var rb in GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = false;
-            rb.linearVelocity = Vector3.zero; // 튀는 현상 방지용 초기화
+            rb.linearVelocity = Vector3.zero; // ?�???�상 방�???초기??
 
-            // 팁: killer의 위치로부터 반대 방향으로 아주 살짝 힘을 주면 더 자연스럽습니다.
+            // ?? killer???�치로�???반�? 방향?�로 ?�주 ?�짝 ?�을 주면 ???�연?�럽?�니??
             if (killer != null)
             {
                 //ApplyRagdollImpact(hitPoint, hitRotation, impulse);
@@ -853,7 +1543,7 @@ public class PostStudent : MonoBehaviour
     //    Rigidbody closestRb = null;
     //    float closestDistance = float.MaxValue;
 
-    //    // 1. 모든 래그돌 리지드바디 중 피격 지점과 가장 가까운 부위를 찾습니다.
+    //    // 1. 모든 ?�그??리�??�바??�??�격 지?�과 가??가까운 부?��? 찾습?�다.
     //    Rigidbody[] rbs = GetComponentsInChildren<Rigidbody>();
     //    foreach (var rb in rbs)
     //    {
@@ -865,13 +1555,13 @@ public class PostStudent : MonoBehaviour
     //        }
     //    }
 
-    //    // 2. 해당 부위에 물리 충격을 가합니다.
+    //    // 2. ?�당 부?�에 물리 충격??가?�니??
     //    if (closestRb != null)
     //    {
-    //        // hitRotation의 forward 방향으로 힘을 전달
+    //        // hitRotation??forward 방향?�로 ?�을 ?�달
     //        Vector3 forceDir = hitRotation * Vector3.back;
 
-    //        // AddForceAtPosition을 쓰면 피격 지점 기준으로 회전력까지 발생해서 더 사실적입니다.
+    //        // AddForceAtPosition???�면 ?�격 지??기�??�로 ?�전?�까지 발생?�서 ???�실?�입?�다.
     //        closestRb.AddForceAtPosition(forceDir * impulse, hitPoint, ForceMode.Impulse);
     //    }
     //}

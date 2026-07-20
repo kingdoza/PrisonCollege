@@ -6,6 +6,7 @@ public class PlayerCamera : MonoBehaviour
     private CameraFollow _cameraFollow;
     private Rigidbody _rigidbody;
     private Collider _collider;
+    public float CurrentPitch => _cameraFollow != null ? _cameraFollow.currentPitch : 0f;
 
 
 
@@ -69,5 +70,14 @@ public class PlayerCamera : MonoBehaviour
         DisablePhysics();
         _cameraFollow.currentPitch = 0;
         _taskCameraRotator.enabled = false;
+    }
+
+
+
+    public void RestoreTutorialView(Quaternion rotation, float pitch)
+    {
+        DisablePhysics();
+        transform.rotation = rotation;
+        _cameraFollow.currentPitch = pitch;
     }
 }

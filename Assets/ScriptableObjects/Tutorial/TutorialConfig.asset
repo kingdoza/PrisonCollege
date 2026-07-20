@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3db1e5240d500a42a479ac36adf84ec, type: 3}
+  m_Name: TutorialConfig
+  m_EditorClassIdentifier: Assembly-CSharp::StageRuntimeConfig
+  _mode: 1
+  _usePreparation: 0
+  _autoSpawnStudents: 0
+  _useInventoryLoadout: 0
+  _useWavePresentation: 0
+  _finishPolicy: 1
+  _tutorialStageTitle: "\uC2E0\uC784\uAD50\uC218 \uC5F0\uC218"
+  _tutorialBehaviorWeightSet: {fileID: 11400000, guid: f900cae10df6c0e4c97a3b51e45d4809, type: 2}
+  _trainingLoadout:
+  - weaponItem: {fileID: 11400000, guid: 654c235f5557bd34f81ffcef5de76243, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  - weaponItem: {fileID: 11400000, guid: 349002a57e48f62439f268876d8d7c39, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  - weaponItem: {fileID: 0}
+    isEmptySlot: 1
+    fillToMaximum: 0
+    ammunition: 0
+  - weaponItem: {fileID: 0}
+    isEmptySlot: 1
+    fillToMaximum: 0
+    ammunition: 0
+  _workTrainingBoost:
+    weaponItem: {fileID: 11400000, guid: 4cea166ce2b59ae4e86269a153b2d3bb, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  _miniWaveLoadout:
+  - weaponItem: {fileID: 11400000, guid: 654c235f5557bd34f81ffcef5de76243, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  - weaponItem: {fileID: 11400000, guid: 349002a57e48f62439f268876d8d7c39, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  - weaponItem: {fileID: 11400000, guid: f142abbb6aee09c40b9b1cce2b2d7f9a, type: 2}
+    isEmptySlot: 0
+    fillToMaximum: 1
+    ammunition: 0
+  _tutorialChaosFactor: 1
+  _tutorialProjectFactor: 1

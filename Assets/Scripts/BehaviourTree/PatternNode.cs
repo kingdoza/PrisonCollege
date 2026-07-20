@@ -760,6 +760,9 @@ public class WorkPattern : PatternNode
                 (_bb.destSpot as MonitorSpot)?.ResumeMonitor();
                 if (_bb.destBehavior == BehaviorType.Hack)
                 {
+                    PostStudent student = _bb.Avatar.GetComponent<PostStudent>();
+                    if (student != null && student.SuppressScriptedWorldConsequences)
+                        return;
                     float defenseProb = AttributeSystem.Instance.HackBlockChanceMod.GetFinalValue(0);
                     float rand = UnityEngine.Random.Range(0f, 1f);
                     if (rand < defenseProb)
@@ -1066,7 +1069,10 @@ public class TryEscapePattern : PatternNode
                 new ConditionDecorator(() =>
                 {
                    ExitSpot exitSpot = _bb.destSpot as ExitSpot;
-                   return exitSpot != null && exitSpot.CanExit;
+                   PostStudent student = _bb.Avatar.GetComponent<PostStudent>();
+                   return exitSpot != null
+                       && exitSpot.CanExit
+                       && (student == null || !student.SuppressScriptedWorldConsequences);
                 },
                    new Sequence(new List<BT_Node>
                    {
@@ -1079,7 +1085,9 @@ public class TryEscapePattern : PatternNode
                        {
                            ExitSpot exitGate = _bb.destSpot as ExitSpot;
                            exitGate.OpenGate();
-                           DOVirtual.DelayedCall(0.8f, () => _bb.Avatar.GetComponent<PostStudent>().OnEscaped(), false);
+                           PostStudent student = _bb.Avatar.GetComponent<PostStudent>();
+                           DOVirtual.DelayedCall(0.8f, student.OnEscaped, false)
+                               .SetTarget(student);
                        }, NodeState.Success),
                        new EscapeTypeSelectPattern(),
                        //new ActionNode(() => _bb.EscapeSuccessEvent?.Invoke()),

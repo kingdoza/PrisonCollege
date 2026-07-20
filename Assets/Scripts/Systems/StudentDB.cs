@@ -6,6 +6,17 @@ public class StudentDB : PersistentSingleton<StudentDB>
 {
     [SerializeField] private StudentEntry[] _studentEntries;
 
+    public int Count => _studentEntries == null ? 0 : _studentEntries.Length;
+
+
+
+    public StudentEntry[] GetAllStudentEntries()
+    {
+        return _studentEntries == null
+            ? System.Array.Empty<StudentEntry>()
+            : (StudentEntry[])_studentEntries.Clone();
+    }
+
 
     public StudentEntry GetStudentEntryAt(int idx)
     {
