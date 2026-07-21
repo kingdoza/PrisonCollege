@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: W0
   m_EditorClassIdentifier: Assembly-CSharp::BehaviorWeightSet
   _weightedElements:
-  - _behaviorType: 8
+  - _behaviorType: 1
     _chance: 1
   - _behaviorType: 2
-    _chance: 10
+    _chance: 1
+  - _behaviorType: 8
+    _chance: 1
+  - _behaviorType: 512
+    _chance: 1
+  - _behaviorType: 2048
+    _chance: 1
+  - _behaviorType: 4096
+    _chance: 1
+  - _behaviorType: 8192
+    _chance: 1
+  - _behaviorType: 32768
+    _chance: 1
+  - _behaviorType: 64
+    _chance: 1
+  - _behaviorType: 256
+    _chance: 1
+  - _behaviorType: 131072
+    _chance: 2
+  - _behaviorType: 4
+    _chance: 2

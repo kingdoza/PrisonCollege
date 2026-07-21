@@ -16,6 +16,8 @@ public class StageRuntimeConfig : ScriptableObject
     [Header("Tutorial data (Tutorial mode only)")]
     [Tooltip("튜토리얼 메뉴에 표시할 스테이지 이름입니다. 예: 신임교수 연수")]
     [SerializeField] private string _tutorialStageTitle;
+    [Tooltip("튜토리얼 씬 시작 시 적용할 고정 Skybox Material입니다. 정규 WaveSystem의 현재 낮/밤 상태는 변경하지 않습니다.")]
+    [SerializeField] private Material _tutorialSkybox;
     [SerializeField] private BehaviorWeightSet _tutorialBehaviorWeightSet;
     [Tooltip("0~7단계 장비입니다. WeaponItem asset을 연결하며, 빈 슬롯은 isEmptySlot으로 명시합니다.")]
     [SerializeField] private TutorialLoadoutEntry[] _trainingLoadout = System.Array.Empty<TutorialLoadoutEntry>();
@@ -34,6 +36,7 @@ public class StageRuntimeConfig : ScriptableObject
     public bool UseWavePresentation => _useWavePresentation;
     public StageFinishPolicy FinishPolicy => _finishPolicy;
     public string TutorialStageTitle => _tutorialStageTitle;
+    public Material TutorialSkybox => _tutorialSkybox;
     public BehaviorWeightSet TutorialBehaviorWeightSet => _tutorialBehaviorWeightSet;
     public TutorialLoadoutEntry[] TrainingLoadout => _trainingLoadout;
     public TutorialLoadoutEntry WorkTrainingBoost => _workTrainingBoost;

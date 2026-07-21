@@ -304,5 +304,6 @@ public readonly struct TutorialBehaviorRuntimeContext
 public sealed class TutorialActorPoolSnapshot
 {
     public readonly List<PostStudent> miniWaveRoster = new();
+    public readonly List<MonitorSpot> miniWaveComputerSeats = new();
     public readonly List<TutorialStudentResetState> studentStates = new();
 }

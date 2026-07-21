@@ -30832,6 +30832,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageController
   _stageNumber: 2
+  _runtimeConfig: {fileID: 0}
   _waveTmp: {fileID: 1561402225}
   _timerTmp: {fileID: 1836529397}
   _chaosTmp: {fileID: 927106294}
@@ -46250,6 +46251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageSpots
   _spotParent: {fileID: 836395579}
+  _tutorialSpotBindings: []
 --- !u!1 &837732328
 GameObject:
   m_ObjectHideFlags: 0

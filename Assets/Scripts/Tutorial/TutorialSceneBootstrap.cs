@@ -27,6 +27,11 @@ public class TutorialSceneBootstrap : MonoBehaviour
             enabled = false;
             return;
         }
+        if (!ApplyTutorialSkybox())
+        {
+            enabled = false;
+            return;
+        }
 
         // DB 전체 학생의 명시적 동기 초기화가 전부 반환된 뒤에만 Director를 시작한다.
         if (!_actorDirector.InitializePool())
@@ -37,5 +42,26 @@ public class TutorialSceneBootstrap : MonoBehaviour
 
         if (!_director.InitializeDirector())
             enabled = false;
+    }
+
+
+
+    private bool ApplyTutorialSkybox()
+    {
+        StageRuntimeConfig runtimeConfig = _stageFacade.RuntimeConfig;
+        if (runtimeConfig == null || !runtimeConfig.IsTutorial)
+        {
+            Debug.LogError("튜토리얼 Skybox를 적용할 StageRuntimeConfig가 없습니다.", this);
+            return false;
+        }
+        if (runtimeConfig.TutorialSkybox == null)
+        {
+            Debug.LogError("Tutorial StageRuntimeConfig의 Tutorial Skybox를 Inspector에서 연결해야 합니다.", runtimeConfig);
+            return false;
+        }
+
+        RenderSettings.skybox = runtimeConfig.TutorialSkybox;
+        DynamicGI.UpdateEnvironment();
+        return true;
     }
 }

@@ -39,7 +39,14 @@ public class TutorialActorDirector : MonoBehaviour
     [SerializeField] private BehaviorType _innocentTrainingBehavior = BehaviorType.LookAround;
 
     [Header("Step 6")]
+    [Tooltip("6단계 대상 학생이 부스터 작업 효과를 기다릴 위치입니다. NavMesh 위의 Transform을 연결합니다.")]
+    [SerializeField] private Transform _studentWorkBoostWaitingPoint;
+    [Tooltip("부스터 작업 효과가 발동된 뒤 학생이 이동해 실제로 작업할 Work spot입니다.")]
     [SerializeField] private BehaveSpot _studentWorkTrainingSpot;
+
+    [Header("Mini wave")]
+    [Tooltip("미니웨이브 선발 학생 순서와 1:1로 대응할 컴퓨터 지정석입니다. 서로 다른 Work 지원 MonitorSpot을 학생 수 이상 연결합니다.")]
+    [SerializeField] private MonitorSpot[] _miniWaveComputerSeats = Array.Empty<MonitorSpot>();
 
     private readonly List<PostStudent> _students = new();
     private readonly List<PostStudent> _riskStudents = new();
@@ -400,9 +407,9 @@ public class TutorialActorDirector : MonoBehaviour
 
     public bool BeginStudentWorkTraining()
     {
-        if (_studentWorkTrainingSpot == null)
+        if (_studentWorkBoostWaitingPoint == null || _studentWorkTrainingSpot == null)
         {
-            Debug.LogError("6단계 studentWorkTrainingSpot 참조가 없습니다.", this);
+            Debug.LogError("6단계 부스터 대기 위치 또는 studentWorkTrainingSpot 참조가 없습니다.", this);
             return false;
         }
 
@@ -423,8 +430,9 @@ public class TutorialActorDirector : MonoBehaviour
         BeginTrainingTransit(
             _studentWorkStudent,
             null,
-            _studentWorkTrainingSpot.transform.position,
-            _studentWorkTrainingSpot);
+            _studentWorkBoostWaitingPoint.position,
+            _studentWorkTrainingSpot,
+            _studentWorkBoostWaitingPoint.rotation);
         return true;
     }
 
@@ -482,17 +490,24 @@ public class TutorialActorDirector : MonoBehaviour
             selected.AddRange(shuffled.GetRange(0, count));
         }
 
-        StopAllMovement();
-        _miniWaveStudents.Clear();
-        _miniWaveStudents.AddRange(selected);
-        _preparedMiniWaveWeights = miniWaveWeights;
-        _isMiniWavePrepared = true;
+        if (!ValidateMiniWaveComputerSeats(count))
+            return false;
 
+        StopAllMovement();
         foreach (PostStudent student in _students)
         {
             student.SetTutorialBoostBlocked(true);
             ReturnToSlotImmediate(student, TutorialStudentMode.Standby, _standbyPoseBool);
+            student.SeatSpot = null;
         }
+
+        for (int i = 0; i < selected.Count; i++)
+            selected[i].SeatSpot = _miniWaveComputerSeats[i];
+
+        _miniWaveStudents.Clear();
+        _miniWaveStudents.AddRange(selected);
+        _preparedMiniWaveWeights = miniWaveWeights;
+        _isMiniWavePrepared = true;
         return true;
     }
 
@@ -505,6 +520,8 @@ public class TutorialActorDirector : MonoBehaviour
             Debug.LogError("준비된 미니웨이브 로스터 또는 BehaviorWeightSet이 없습니다.", this);
             return false;
         }
+        if (!ValidatePreparedMiniWaveComputerSeats())
+            return false;
 
         foreach (PostStudent student in _students)
         {
@@ -537,6 +554,8 @@ public class TutorialActorDirector : MonoBehaviour
     {
         TutorialActorPoolSnapshot snapshot = new();
         snapshot.miniWaveRoster.AddRange(_miniWaveStudents);
+        foreach (PostStudent student in _miniWaveStudents)
+            snapshot.miniWaveComputerSeats.Add(student.SeatSpot);
         foreach (PostStudent student in _students)
             snapshot.studentStates.Add(student.CaptureTutorialResetState());
         return snapshot;
@@ -546,9 +565,26 @@ public class TutorialActorDirector : MonoBehaviour
 
     public bool RestoreSnapshot(TutorialActorPoolSnapshot snapshot)
     {
-        if (snapshot == null || snapshot.studentStates.Count != _students.Count)
+        if (snapshot == null
+            || snapshot.studentStates.Count != _students.Count
+            || snapshot.miniWaveRoster.Count != snapshot.miniWaveComputerSeats.Count)
             return false;
         StopAllMovement();
+
+        foreach (PostStudent student in _students)
+            student.SeatSpot = null;
+        for (int i = 0; i < snapshot.miniWaveRoster.Count; i++)
+        {
+            PostStudent student = snapshot.miniWaveRoster[i];
+            MonitorSpot seat = snapshot.miniWaveComputerSeats[i];
+            if (student == null || !_students.Contains(student) || seat == null)
+            {
+                Debug.LogError("미니웨이브 체크포인트의 학생 또는 컴퓨터 지정석 참조가 유효하지 않습니다.", this);
+                return false;
+            }
+            student.SeatSpot = seat;
+        }
+
         _miniWaveStudents.Clear();
         _miniWaveStudents.AddRange(snapshot.miniWaveRoster);
         _isMiniWavePrepared = _preparedMiniWaveWeights != null && _miniWaveStudents.Count > 0;
@@ -590,11 +626,20 @@ public class TutorialActorDirector : MonoBehaviour
 
 
 
+    public void ClearMiniWaveComputerSeats()
+    {
+        foreach (PostStudent student in _students)
+            if (student != null) student.SeatSpot = null;
+    }
+
+
+
     private void BeginTrainingTransit(
         PostStudent student,
         ScriptedBehaviorRequest? request,
         Vector3? destinationOverride = null,
-        BehaveSpot boostedWorkSpot = null)
+        BehaveSpot boostedWorkSpot = null,
+        Quaternion? arrivalRotation = null)
     {
         CancelMovement(student);
         student.SetTutorialMode(TutorialStudentMode.TrainingTransit);
@@ -604,7 +649,7 @@ public class TutorialActorDirector : MonoBehaviour
         if (!student.MoveForTutorial(destination, _trainingMoveSpeed))
             Debug.LogError($"[{student.name}] 연수 지점 NavMesh 이동을 시작하지 못했습니다.", student);
         _movementByStudent[student] = StartCoroutine(
-            TrainingTransitRoutine(student, request, boostedWorkSpot));
+            TrainingTransitRoutine(student, request, boostedWorkSpot, arrivalRotation));
     }
 
 
@@ -612,7 +657,8 @@ public class TutorialActorDirector : MonoBehaviour
     private IEnumerator TrainingTransitRoutine(
         PostStudent student,
         ScriptedBehaviorRequest? request,
-        BehaveSpot boostedWorkSpot)
+        BehaveSpot boostedWorkSpot,
+        Quaternion? arrivalRotation)
     {
         NavMeshAgent agent = student.TutorialAgent;
         while (agent.enabled
@@ -623,6 +669,8 @@ public class TutorialActorDirector : MonoBehaviour
 
         _movementByStudent.Remove(student);
         student.StopTutorialMovementAnimation();
+        if (arrivalRotation.HasValue)
+            student.transform.rotation = arrivalRotation.Value;
         student.SetTutorialMode(TutorialStudentMode.Training);
         TrainingDestinationReached?.Invoke(student);
         if (request.HasValue)
@@ -749,6 +797,11 @@ public class TutorialActorDirector : MonoBehaviour
             Debug.LogError("4-1 행동은 연결한 innocentTrainingSpot이 지원하는 비위험 행동이어야 합니다.", this);
             valid = false;
         }
+        if (valid && _studentWorkBoostWaitingPoint == null)
+        {
+            Debug.LogError("6단계 studentWorkBoostWaitingPoint를 연결해야 합니다.", this);
+            valid = false;
+        }
         if (valid && (_studentWorkTrainingSpot == null
             || !_studentWorkTrainingSpot.HasBehavior(BehaviorType.Work)))
         {
@@ -756,6 +809,74 @@ public class TutorialActorDirector : MonoBehaviour
             valid = false;
         }
         return valid;
+    }
+
+
+
+    private bool ValidateMiniWaveComputerSeats(int count)
+    {
+        if (_miniWaveComputerSeats == null || _miniWaveComputerSeats.Length < count)
+        {
+            Debug.LogError(
+                $"미니웨이브 학생 {count}명에게 필요한 컴퓨터 지정석이 부족합니다. "
+                + $"TutorialActorDirector에 서로 다른 MonitorSpot을 {count}개 이상 연결해야 합니다.",
+                this);
+            return false;
+        }
+
+        HashSet<MonitorSpot> uniqueSeats = new();
+        for (int i = 0; i < count; i++)
+        {
+            MonitorSpot seat = _miniWaveComputerSeats[i];
+            if (seat == null)
+            {
+                Debug.LogError($"미니웨이브 컴퓨터 지정석 index {i} 참조가 없습니다.", this);
+                return false;
+            }
+            if (!uniqueSeats.Add(seat))
+            {
+                Debug.LogError($"미니웨이브 컴퓨터 지정석 '{seat.name}'이 중복 연결됐습니다.", seat);
+                return false;
+            }
+            if (!seat.HasBehavior(BehaviorType.Work))
+            {
+                Debug.LogError($"미니웨이브 컴퓨터 지정석 '{seat.name}'이 Work 행동을 지원하지 않습니다.", seat);
+                return false;
+            }
+            if (!seat.IsUsable)
+            {
+                Debug.LogError($"미니웨이브 컴퓨터 지정석 '{seat.name}'이 준비 시점에 이미 사용 중입니다.", seat);
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+    private bool ValidatePreparedMiniWaveComputerSeats()
+    {
+        HashSet<MonitorSpot> uniqueSeats = new();
+        foreach (PostStudent student in _miniWaveStudents)
+        {
+            MonitorSpot seat = student != null ? student.SeatSpot : null;
+            if (seat == null)
+            {
+                Debug.LogError($"미니웨이브 선발 학생 '{student?.name ?? "null"}'의 컴퓨터 지정석이 없습니다.", this);
+                return false;
+            }
+            if (!uniqueSeats.Add(seat))
+            {
+                Debug.LogError($"미니웨이브 선발 학생들의 컴퓨터 지정석 '{seat.name}'이 중복됐습니다.", seat);
+                return false;
+            }
+            if (!seat.IsUsable)
+            {
+                Debug.LogError($"미니웨이브 시작 시 컴퓨터 지정석 '{seat.name}'이 이미 사용 중입니다.", seat);
+                return false;
+            }
+        }
+        return true;
     }
 
 

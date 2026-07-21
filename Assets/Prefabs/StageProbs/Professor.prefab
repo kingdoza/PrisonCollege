@@ -1021,6 +1021,7 @@ GameObject:
   - component: {fileID: 1813016169071448197}
   - component: {fileID: 8049208773672886509}
   - component: {fileID: 9027236942492272702}
+  - component: {fileID: 6671235901638555776}
   m_Layer: 12
   m_Name: Professor
   m_TagString: Player
@@ -1434,6 +1435,26 @@ MonoBehaviour:
   _sprintSD: {fileID: 11400000, guid: 1de447f2f59295e4e926565645ac3be3, type: 2}
   _walkStepInterval: 0.5
   _sprintStepInterval: 0.3
+--- !u!114 &6671235901638555776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1816700227934849980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &2505243207511961740
 GameObject:
   m_ObjectHideFlags: 0

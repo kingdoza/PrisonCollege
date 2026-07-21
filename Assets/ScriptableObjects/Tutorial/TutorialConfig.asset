@@ -19,6 +19,7 @@ MonoBehaviour:
   _useWavePresentation: 0
   _finishPolicy: 1
   _tutorialStageTitle: "\uC2E0\uC784\uAD50\uC218 \uC5F0\uC218"
+  _tutorialSkybox: {fileID: 2100000, guid: 3e5399bd195de7649b874f58c1b9f8a3, type: 2}
   _tutorialBehaviorWeightSet: {fileID: 11400000, guid: f900cae10df6c0e4c97a3b51e45d4809, type: 2}
   _trainingLoadout:
   - weaponItem: {fileID: 11400000, guid: 654c235f5557bd34f81ffcef5de76243, type: 2}

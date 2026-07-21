@@ -91,6 +91,7 @@ public class TutorialMiniWaveStep : TutorialStepBase
         Context.hud.ShowMiniWaveHud(false);
         Context.facade.StopAllStageSimulation();
         Context.actors.StopAllActors();
+        Context.actors.ClearMiniWaveComputerSeats();
     }
 
     private static TutorialStagePolicy MiniWavePolicy()
