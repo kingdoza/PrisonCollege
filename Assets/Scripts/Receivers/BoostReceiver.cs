@@ -8,6 +8,7 @@ public class BoostReceiver : EffectReceiver
     public UnityEvent FrenzyTriggerEvent = new();
 
     private AttributeModifier boostTaskChanceMod;
+    private bool _tutorialGuaranteedWork;
 
 
 
@@ -16,10 +17,23 @@ public class BoostReceiver : EffectReceiver
         boostTaskChanceMod = AttributeSystem.Instance.BoostTaskChanceMod;
     }
 
+    public void SetTutorialGuaranteedWork(bool enabled)
+    {
+        _tutorialGuaranteedWork = enabled;
+    }
+
+
+
     protected override void ApplyEffect(EffectData data, HitInfo hitInfo)
     {
         BoostData boostData = data as BoostData;
         if (boostData == null) return;
+        if (_tutorialGuaranteedWork)
+        {
+            WorkTriggerEvent?.Invoke();
+            return;
+        }
+
         float workChance = boostData.IgnorePassiveProbabilityModifiers
             ? boostData.potency.workProbability
             : boostTaskChanceMod.GetFinalValue(boostData.potency.workProbability);

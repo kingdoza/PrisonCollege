@@ -126,7 +126,8 @@ public class SlotPackage : MonoBehaviour
         }
         else if (selectedItem is WeaponItem)
         {
-             AddWeaponItemSlot(selectedItem);
+            InventorySystem.Instance.FillEquipSlots(_equipSlotList);
+            InventorySystem.Instance.FillWeaponSlots(_weaponSlotList);
         }
         //_selectedSlot.HighLight();
         //_itemInfoPanel.ShowPanel(_selectedSlot.GetComponent<ItemSlot>());
@@ -147,20 +148,6 @@ public class SlotPackage : MonoBehaviour
         return slotSelector;
     }
 
-
-
-    private SlotSelector AddWeaponItemSlot(Item item)
-    {
-        foreach (ItemSlot slot in _weaponSlotList)
-        {
-            if (slot.Item == null)
-            {
-                slot.SetItem(item);
-                return slot.GetComponent<SlotSelector>();
-            }
-        }
-        return null;
-    }
 
 
     public void StartWave_Btn()

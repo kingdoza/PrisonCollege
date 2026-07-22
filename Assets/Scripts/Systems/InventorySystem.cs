@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class InventorySystem : PersistentSingleton<InventorySystem>
 {
+    private static readonly StringComparer ShopItemNameComparer =
+        StringComparer.Create(CultureInfo.GetCultureInfo("ko-KR"), true);
+
     [SerializeField] private List<Item> _totalItemList;
     [SerializeField] private List<WeaponItem> _defaultEquipedItemList;
     [SerializeField] private int _equipLimit = 4;
@@ -75,18 +80,51 @@ public class InventorySystem : PersistentSingleton<InventorySystem>
         _money -= item.price;
         _nonPurchasedItemSet.Remove(item);
         _purchasedItemSet.Add(item);
+        if (item is WeaponItem weaponItem)
+            TryEquipPurchasedWeapon(weaponItem);
+    }
+
+
+
+    private bool TryEquipPurchasedWeapon(WeaponItem weaponItem)
+    {
+        if (_equipedItemList == null || _equipedItemList.Contains(weaponItem)) return false;
+
+        for (int i = 0; i < _equipedItemList.Count; i++)
+        {
+            if (_equipedItemList[i] != null) continue;
+            _equipedItemList[i] = weaponItem;
+            return true;
+        }
+        return false;
     }
 
 
 
     public void ConstructShopSlots(SlotEntry slotEntry)
     {
-        foreach (var item in _nonPurchasedItemSet)
+        List<Item> sortedItems = _nonPurchasedItemSet
+            .Where(item => item != null)
+            .OrderBy(GetShopItemCategoryOrder)
+            .ThenBy(item => item.name ?? string.Empty, ShopItemNameComparer)
+            .ThenBy(item => item.id)
+            .ToList();
+
+        foreach (Item item in sortedItems)
         {
             GameObject slotObject = Instantiate(slotEntry.prefab, slotEntry.parent);
             ItemSlot itemSlot = slotObject.GetComponent<ItemSlot>();
             itemSlot.SetItem(item);
         }
+    }
+
+
+
+    private static int GetShopItemCategoryOrder(Item item)
+    {
+        if (item is WeaponItem) return 0;
+        if (item is PassiveItem) return 1;
+        return 2;
     }
 
 

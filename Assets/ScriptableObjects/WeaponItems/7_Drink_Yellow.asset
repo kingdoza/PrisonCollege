@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: db2a5b78442626348991fc2b4fd207cf, type: 3}
   price: 0
   effect: "\uB300\uD559\uC6D0\uC0DD\uC774 \uB9DE\uC744 \uC2DC\r\n\uC77C\uD560 \uD655\uB960
-    : 20%\r\n\uC2F8\uC6B8 \uD655\uB960 : 5%\r\n\uBB34\uD6A8\uACFC \uD655\uB960 :
+    : 25%\r\n\uC2F8\uC6B8 \uD655\uB960 : 5%\r\n\uBB34\uD6A8\uACFC \uD655\uB960 :
     75%"
   description: "[\uC5D0\uB108\uC9C0\uB4DC\uB9C1\uD06C]\r\n\uB300\uD559\uC6D0\uC0DD\uC744
     \uAC01\uC131 \uC2DC\uD0A4\uB294 \uC57D\uD55C \uBC84\uC804\uC758 \uB4DC\uB9C1\uD06C\uC785\uB2C8\uB2E4."
