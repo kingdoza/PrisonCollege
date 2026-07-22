@@ -453,7 +453,7 @@ public class RushThroughPattern : PatternNode
             new SetAnimRootMotion(true),
             new SetAnimBool("Rush", true),
             //new Delay(() => 1.1f),
-            new DelayRange(4, 6),
+            new RushChargeDelayNode(4f, 6f),
             //new SetAnimRootMotion(true),
             new ActionNode(() => {
                 var attacker = _bb.Avatar.GetComponent<PostStudent>().GetOverlapAttacker(OverlapAttackType.BodySlam);
@@ -462,6 +462,82 @@ public class RushThroughPattern : PatternNode
             new PlayOnceAnim("RushStart", "RushStart"),
             new ActionNode(null, NodeState.Running),
         });
+    }
+}
+
+
+
+public class RushChargeDelayNode : BT_Node
+{
+    private readonly float _minBaseDuration;
+    private readonly float _maxBaseDuration;
+    private PostStudent _student;
+    private bool _isStarted;
+
+
+
+    public RushChargeDelayNode(float minBaseDuration, float maxBaseDuration)
+    {
+        _minBaseDuration = Mathf.Max(0f, minBaseDuration);
+        _maxBaseDuration = Mathf.Max(_minBaseDuration, maxBaseDuration);
+    }
+
+
+
+    public override NodeState Evaluate()
+    {
+        if (!_isStarted)
+        {
+            _student = _bb?.Avatar != null
+                ? _bb.Avatar.GetComponent<PostStudent>()
+                : null;
+            if (_student == null)
+            {
+                ResetLocalState();
+                return NodeState.Failure;
+            }
+
+            float baseDuration = UnityEngine.Random.Range(_minBaseDuration, _maxBaseDuration);
+            if (StageController.Instance)
+                baseDuration = StageController.Instance.GetChaosEffectedDelay(baseDuration);
+
+            if (!_student.BeginRushChargeDelay(baseDuration))
+            {
+                ResetLocalState();
+                return NodeState.Failure;
+            }
+            _isStarted = true;
+        }
+
+        if (!_student.IsRushCharging)
+        {
+            ResetLocalState();
+            return NodeState.Failure;
+        }
+
+        if (!_student.TickRushChargeDelay(Time.deltaTime))
+            return NodeState.Running;
+
+        _student.CompleteRushChargeDelay();
+        ResetLocalState();
+        return NodeState.Success;
+    }
+
+
+
+    public override void Reset()
+    {
+        if (_isStarted && _student != null)
+            _student.CancelRushChargeDelay();
+        ResetLocalState();
+    }
+
+
+
+    private void ResetLocalState()
+    {
+        _student = null;
+        _isStarted = false;
     }
 }
 

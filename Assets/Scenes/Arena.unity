@@ -6348,7 +6348,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Enter\uB85C \uB9C9\uACE0\uB77C \uC2DC\uC791\uD558\uAE30\n<size=80%>\uB0A8\uAD81\uD6C8
+  m_text: "Tab\uC73C\uB85C \uB9C9\uACE0\uB77C \uC2DC\uC791\uD558\uAE30\n<size=80%>\uB0A8\uAD81\uD6C8
     \uC2B9\uB9AC \uC2DC : 400 \uD68D\uB4DD\n\uB0A8\uAD81\uD6C8 \uD328\uBC30 \uC2DC
     : 200 \uC190\uC2E4</size>"
   m_isRightToLeft: 0

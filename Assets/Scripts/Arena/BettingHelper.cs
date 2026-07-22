@@ -63,7 +63,7 @@ public class BettingHelper : MonoBehaviour
 
     private void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) && _selectedSide != SelectedSide.None)
+        if (Input.GetKeyDown(KeyCode.Tab) && _selectedSide != SelectedSide.None)
         {
             _isStarted = true;
             FightStartEvent?.Invoke(_selectedSide, _betMoney);
@@ -165,7 +165,7 @@ public class BettingHelper : MonoBehaviour
             return;
         }
         string targetName = _selectedSide == SelectedSide.Left ? _leftBtnTmp.text : _rightBtnTmp.text;
-        _continueTmp.text = $"Enter로 막고라 시작하기\r\n<size=80%>{targetName} 승리 시 : +{(_betMoney * 2).ToString("N0")}";//\r\n{targetName} 패배 시 : -{_betMoney.ToString("N0")}</size>";
+        _continueTmp.text = $"Tab으로 막고라 시작하기\r\n<size=80%>{targetName} 승리 시 : +{(_betMoney * 2).ToString("N0")}";//\r\n{targetName} 패배 시 : -{_betMoney.ToString("N0")}</size>";
     }
 
 

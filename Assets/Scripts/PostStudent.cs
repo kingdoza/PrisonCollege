@@ -74,6 +74,18 @@ public class PostStudent : MonoBehaviour
     [SerializeField] private OverlapAttacker _bodyOverlapAttacker;
     [SerializeField] private OverlapAttacker _tackleOverlapAttacker;
 
+    [Header("Rush Charge")]
+    [SerializeField, Min(0f), Tooltip("Minimum delay added per actual damage hit while charging a rush.")]
+    private float _rushHitDelayMin;
+    [SerializeField, Min(0f), Tooltip("Maximum delay added per actual damage hit while charging a rush.")]
+    private float _rushHitDelayMax;
+
+    private bool _isRushCharging;
+    private float _rushChargeBaseDuration;
+    private float _rushChargeElapsed;
+    private float _rushChargeAddedDelay;
+    private int _rushChargeDelayHitCount;
+
     [HideInInspector] public UnityEvent<PostStudent, HitInfo> DieEvent = new();
     [HideInInspector] public UnityEvent<PostStudent> EscapeEvent = new();
     [Header("Audios")]
@@ -108,6 +120,9 @@ public class PostStudent : MonoBehaviour
     public bool IsHealthDepleted => _damageReceiver != null && _damageReceiver.Health.IsDepleted;
     public float CurrentHealth => _damageReceiver != null ? _damageReceiver.Health.Current : 0f;
     public float MaxHealth => _damageReceiver != null ? _damageReceiver.Health.Max : 0f;
+    public bool IsRushCharging => _isRushCharging;
+    public float RushChargeAddedDelay => _rushChargeAddedDelay;
+    public int RushChargeDelayHitCount => _rushChargeDelayHitCount;
     public NavMeshAgent TutorialAgent => _agent;
     public event Action<PostStudent, ScriptedBehaviorRequest, TutorialBehaviorTelemetry> ScriptedBehaviorTelemetryEvent;
     public event Action<PostStudent> TutorialStandUpCompletedEvent;
@@ -117,6 +132,15 @@ public class PostStudent : MonoBehaviour
     //public BehaviorWeightSet BehaviorWeightSet { get; set; }
     private AttributeModifier _moveSpeedModifier;
     public BT_Node Root => _root;
+
+
+
+    private void OnValidate()
+    {
+        _rushHitDelayMin = Mathf.Max(0f, _rushHitDelayMin);
+        _rushHitDelayMax = Mathf.Max(_rushHitDelayMin, _rushHitDelayMax);
+    }
+
 
 
     private void Awake()
@@ -149,6 +173,14 @@ public class PostStudent : MonoBehaviour
 
         StageController.Instance.StageStartEvent.AddListener(Wakeup);
     }
+
+
+
+    private void OnDisable() => ClearRushChargeDelay();
+
+
+
+    private void OnDestroy() => ClearRushChargeDelay();
 
 
 
@@ -237,6 +269,7 @@ public class PostStudent : MonoBehaviour
 
     private void CreateBehaviorRuntime()
     {
+        ClearRushChargeDelay();
         _characterCollider.enabled = true;
         _blackboard = new Blackboard(gameObject, BehaviorWeightSet, _stageSpots, _player.gameObject);
         _blackboard.EscapeSuccessEvent.AddListener(OnEscaped);
@@ -342,6 +375,64 @@ public class PostStudent : MonoBehaviour
         Debug.Log("StopAllOverlapAttackers");
         _bodyOverlapAttacker.StopAttack();
         _tackleOverlapAttacker.StopAttack();
+    }
+
+
+
+    public bool BeginRushChargeDelay(float baseDuration)
+    {
+        ClearRushChargeDelay();
+        if (!isActiveAndEnabled || IsHealthDepleted) return false;
+
+        _rushChargeBaseDuration = Mathf.Max(0f, baseDuration);
+        _isRushCharging = true;
+        return true;
+    }
+
+
+
+    public bool TickRushChargeDelay(float deltaTime)
+    {
+        if (!_isRushCharging) return false;
+
+        _rushChargeElapsed += Mathf.Max(0f, deltaTime);
+        return _rushChargeElapsed >= _rushChargeBaseDuration + _rushChargeAddedDelay;
+    }
+
+
+
+    public void CompleteRushChargeDelay() => ClearRushChargeDelay();
+
+
+
+    public void CancelRushChargeDelay() => ClearRushChargeDelay();
+
+
+
+    private void AddRushChargeHitDelay(float hitAmount)
+    {
+        if (!_isRushCharging || hitAmount <= 0f || IsHealthDepleted) return;
+
+        float minDelay = Mathf.Max(0f, _rushHitDelayMin);
+        float maxDelay = Mathf.Max(minDelay, _rushHitDelayMax);
+        if (maxDelay <= 0f) return;
+
+        float addedDelay = Mathf.Approximately(minDelay, maxDelay)
+            ? minDelay
+            : UnityEngine.Random.Range(minDelay, maxDelay);
+        _rushChargeAddedDelay += addedDelay;
+        _rushChargeDelayHitCount++;
+    }
+
+
+
+    private void ClearRushChargeDelay()
+    {
+        _isRushCharging = false;
+        _rushChargeBaseDuration = 0f;
+        _rushChargeElapsed = 0f;
+        _rushChargeAddedDelay = 0f;
+        _rushChargeDelayHitCount = 0;
     }
 
 
@@ -773,6 +864,7 @@ public class PostStudent : MonoBehaviour
         else
             CleanupCurrentBehaviorRuntime();
         _root?.Reset();
+        ClearRushChargeDelay();
         _root = null;
         if (state.behaviorWeightSet != null)
             BehaviorWeightSet = state.behaviorWeightSet.CreateDeepCopy();
@@ -818,6 +910,8 @@ public class PostStudent : MonoBehaviour
     public void SetTutorialMode(TutorialStudentMode mode)
     {
         if (!_tutorialBehaviorRuntimeInitialized) return;
+        if (_tutorialMode != mode)
+            ClearRushChargeDelay();
         if (_tutorialMode == TutorialStudentMode.Cheer && mode != TutorialStudentMode.Cheer)
             StopTutorialCheerAnimation(true);
         if (mode != TutorialStudentMode.Training && mode != TutorialStudentMode.MiniWave)
@@ -900,6 +994,7 @@ public class PostStudent : MonoBehaviour
     private bool CancelScriptedBehaviorInternal(bool reportInterrupted)
     {
         if (!_hasScriptedBehaviorRequest) return false;
+        ClearRushChargeDelay();
         DOTween.Kill(this);
         ScriptedBehaviorRequest cancelled = _scriptedBehaviorRequest;
         _blackboard?.destSpot?.Release(this);
@@ -931,6 +1026,7 @@ public class PostStudent : MonoBehaviour
 
     private void CleanupCurrentBehaviorRuntime()
     {
+        ClearRushChargeDelay();
         DOTween.Kill(this);
         if (_blackboard != null)
         {
@@ -1039,6 +1135,7 @@ public class PostStudent : MonoBehaviour
     {
         if (!_tutorialBehaviorRuntimeInitialized || miniWaveWeights == null) return;
         CancelScriptedBehaviorInternal(false);
+        ClearRushChargeDelay();
         _root = null;
         BehaviorWeightSet = miniWaveWeights.CreateDeepCopy();
         CreateBehaviorRuntime();
@@ -1271,6 +1368,7 @@ public class PostStudent : MonoBehaviour
 
     private void ResetTutorialAnimationAndAttachments()
     {
+        ClearRushChargeDelay();
         StopTutorialCheerAnimation(false);
         StopAllOverlapAttackers();
         HideAllAnimAttachments();
@@ -1383,6 +1481,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnDamaged(HitInfo hitInfo, float hitAmount)
     {
+        AddRushChargeHitDelay(hitAmount);
         if (_blackboard == null) return;
         _blackboard.isDamaged = true;
         _blackboard.isStunned = true;
@@ -1408,6 +1507,7 @@ public class PostStudent : MonoBehaviour
     public void OnEscaped()
     {
         if (SuppressScriptedWorldConsequences) return;
+        ClearRushChargeDelay();
         EscapeEvent?.Invoke(this);
         _blackboard.destSpot?.Release(this);
         gameObject.SetActive(false);
@@ -1418,6 +1518,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnDie(HitInfo hitInfo)
     {
+        ClearRushChargeDelay();
         DieEvent?.Invoke(this, hitInfo);
 
         GameObject playerObject = _blackboard.Player.gameObject;
@@ -1517,6 +1618,7 @@ public class PostStudent : MonoBehaviour
 
     private void OnDie(Vector3 hitPoint, Quaternion hitRotation, float impulse, GameObject killer)
     {
+        ClearRushChargeDelay();
         _root = null;
         _agent.speed = 0;
         _anim.enabled = false;
