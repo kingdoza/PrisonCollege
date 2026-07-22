@@ -6,6 +6,8 @@ public class MainScreen : MonoBehaviour
     [SerializeField] private SettingPanel _settingPanel;
     [SerializeField] private SimplePanel _membersPanel;
     [SerializeField] private SimplePanel _exitCheckPanel;
+    [Tooltip("튜토리얼 버튼에 부착한 최초 실행 안내 효과입니다. 연결하지 않아도 버튼 기능은 유지됩니다.")]
+    [SerializeField] private TutorialButtonAttention _tutorialButtonAttention;
 
 
 
@@ -26,6 +28,16 @@ public class MainScreen : MonoBehaviour
         _membersPanel.Hide();
         _exitCheckPanel.Hide();
 
+        bool shouldShowTutorialAttention = !TutorialLaunchState.HasStartedOnce;
+        if (_tutorialButtonAttention != null)
+        {
+            _tutorialButtonAttention.SetAttentionActive(shouldShowTutorialAttention);
+        }
+        else if (shouldShowTutorialAttention)
+        {
+            Debug.LogWarning("최초 튜토리얼 실행 안내를 표시할 TutorialButtonAttention 참조가 없습니다.", this);
+        }
+
         if (GameManager.Instance.hasToStageSelect == true)
         {
             GameManager.Instance.hasToStageSelect = false;
@@ -44,6 +56,8 @@ public class MainScreen : MonoBehaviour
 
     public void Tutorial_Btn()
     {
+        TutorialLaunchState.MarkStartedOnce();
+        _tutorialButtonAttention?.SetAttentionActive(false);
         GameManager.Instance.StartTutorial();
     }
 

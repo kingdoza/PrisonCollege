@@ -81,6 +81,7 @@ public class StageController : SceneSingleton<StageController>
     private int _tutorialEscapeFailureThreshold = 3;
     private int _tutorialEscapeCount;
     private float _tutorialTimerRemaining;
+    private bool _tutorialTimerDisplayReady;
     private bool _tutorialTimerFinishedReported;
     private int _projectCompletionId;
     private bool _tutorialSimulationStopped;
@@ -252,7 +253,12 @@ public class StageController : SceneSingleton<StageController>
         _isPreparing = false;
         if (_preparePanelGroup != null) _preparePanelGroup.alpha = 0f;
         if (_topPanelGroup != null) _topPanelGroup.alpha = 1f;
-        if (_waveTmp != null) _waveTmp.gameObject.SetActive(false);
+        if (_waveTmp != null)
+        {
+            _waveTmp.text = _runtimeConfig.TutorialStageTitle;
+            _waveTmp.gameObject.SetActive(true);
+        }
+        if (_escapeTmp != null) _escapeTmp.gameObject.SetActive(true);
         _menuPanel?.InitTutorial(_runtimeConfig.TutorialStageTitle);
         RenderReflectionProbes();
         UpdateUIs(0f);
@@ -537,10 +543,17 @@ public class StageController : SceneSingleton<StageController>
         int minutes = Mathf.FloorToInt(TimerRemaining / 60f);
         int seconds = Mathf.FloorToInt(TimerRemaining % 60f);
         //_timerTmp.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-        _timerTmp.text = TimerRemaining.ToString("F0");
-        if (TimerRemaining < 11)
+        if (IsTutorialRuntime && !_tutorialTimerDisplayReady)
         {
-            _timerTmp.text = $"<color=red>{_timerTmp.text}</color>";
+            _timerTmp.text = "<color=white>-</color>";
+        }
+        else
+        {
+            _timerTmp.text = TimerRemaining.ToString("F0");
+            if (TimerRemaining < 11)
+            {
+                _timerTmp.text = $"<color=red>{_timerTmp.text}</color>";
+            }
         }
 
         _chaosTmp.text = _chaosStat.Current.ToString("F0");
@@ -794,6 +807,7 @@ public class StageController : SceneSingleton<StageController>
     {
         if (!EnsureTutorialControl(nameof(SetTimerForTutorial))) return false;
         _tutorialTimerRemaining = Mathf.Max(0f, seconds);
+        _tutorialTimerDisplayReady = true;
         _tutorialTimerFinishedReported = false;
         _timerStat.Initialize(true);
         _timerStat.Increase(_tutorialTimerRemaining);

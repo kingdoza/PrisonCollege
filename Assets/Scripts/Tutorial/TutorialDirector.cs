@@ -197,6 +197,8 @@ public class TutorialDirector : MonoBehaviour
 
         if (!_hud.InitializeButtons(RestartMiniWave, SkipMiniWave, Reenroll, ExitToMainMenu))
             return false;
+        if (!_facade.SetEscapeCount(0, _courseDefinition.MiniWaveEscapeFailureThreshold))
+            return false;
 
         _isInitialized = true;
         _isTransitioning = true;
