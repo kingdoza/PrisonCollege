@@ -9891,12 +9891,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Microwave
   _explosionParticle: {fileID: 5200843380138433288}
-  _fireInvokeThereshold: 0.5
+  _fireInvokeThereshold: 0.8
   _foodSocket: {fileID: 3701650912207028944}
   _cookingLight: {fileID: 2411987267139183067}
   _humSD: {fileID: 11400000, guid: 660fc94a8992a414ba418d9f09486cea, type: 2}
   _explosionSD: {fileID: 11400000, guid: 2cf228362673ea342a2cea61199f895d, type: 2}
   _hazardCookingVfx: {fileID: 3281809815562155918}
+  _foodRotationSpeed: 90
 --- !u!114 &2906868891966806921
 MonoBehaviour:
   m_ObjectHideFlags: 0

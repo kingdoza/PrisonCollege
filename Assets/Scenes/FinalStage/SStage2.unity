@@ -3733,6 +3733,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 488034461}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &88851698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5162,6 +5163,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1775235188}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &132195528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9572,6 +9574,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 154048770}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &266664272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32430,6 +32433,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 644365261}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &610093600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35234,7 +35238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 20
+  _maxStat: 25
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -35350,7 +35354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 90
+  _maxStat: 80
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -35380,6 +35384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageController
   _stageNumber: 2
+  _runtimeConfig: {fileID: 0}
   _waveTmp: {fileID: 1815237746}
   _timerTmp: {fileID: 1500969886}
   _chaosTmp: {fileID: 1993212374}
@@ -37533,6 +37538,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1007151408}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &714380642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44632,6 +44638,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 631348630}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &864151293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78065,6 +78072,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageSpots
   _spotParent: {fileID: 1454568087}
+  _tutorialSpotBindings: []
 --- !u!1 &1455196225
 GameObject:
   m_ObjectHideFlags: 0
@@ -107912,6 +107920,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1750305581}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &2040267296
 MonoBehaviour:
   m_ObjectHideFlags: 0

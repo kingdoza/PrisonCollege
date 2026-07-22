@@ -21748,6 +21748,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 177797332}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &113485643
 GameObject:
   m_ObjectHideFlags: 0
@@ -44429,6 +44430,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1633923815}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &300757898
 GameObject:
   m_ObjectHideFlags: 0
@@ -46650,6 +46652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageSpots
   _spotParent: {fileID: 336254824}
+  _tutorialSpotBindings: []
 --- !u!43 &336576429
 Mesh:
   m_ObjectHideFlags: 0
@@ -125632,6 +125635,8 @@ MonoBehaviour:
   _cookingLight: {fileID: 1227099657}
   _humSD: {fileID: 11400000, guid: 660fc94a8992a414ba418d9f09486cea, type: 2}
   _explosionSD: {fileID: 11400000, guid: 2cf228362673ea342a2cea61199f895d, type: 2}
+  _hazardCookingVfx: {fileID: 0}
+  _foodRotationSpeed: 90
 --- !u!114 &859431189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148111,6 +148116,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 939235819}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &1099432594
 GameObject:
   m_ObjectHideFlags: 0
@@ -149063,6 +149069,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 2115695866}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &1112196690
 GameObject:
   m_ObjectHideFlags: 0
@@ -195198,7 +195205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 20
+  _maxStat: 25
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -195314,7 +195321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 90
+  _maxStat: 80
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -195344,6 +195351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageController
   _stageNumber: 2
+  _runtimeConfig: {fileID: 0}
   _waveTmp: {fileID: 1788403580}
   _timerTmp: {fileID: 216627272}
   _chaosTmp: {fileID: 223106733}
@@ -202462,6 +202470,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 254639836}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &1418350805
 GameObject:
   m_ObjectHideFlags: 0
@@ -289427,6 +289436,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 802397574}
+  _hackingVfx: {fileID: 0}
 --- !u!114 &1856165364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289518,6 +289528,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 575982211}
+  _hackingVfx: {fileID: 0}
 --- !u!1 &1857369628
 GameObject:
   m_ObjectHideFlags: 0
