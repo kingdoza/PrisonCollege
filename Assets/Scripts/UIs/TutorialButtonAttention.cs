@@ -1,10 +1,9 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [DisallowMultipleComponent]
-public sealed class TutorialButtonAttention : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public sealed class TutorialButtonAttention : MonoBehaviour
 {
     [Header("9-Slice Frame")]
     [Tooltip("튜토리얼 버튼의 Stretch 자식으로 배치한 9-Slice 테두리 RectTransform입니다.")]
@@ -21,13 +20,13 @@ public sealed class TutorialButtonAttention : MonoBehaviour, IPointerEnterHandle
     [Min(0f)] [SerializeField] private float _fadeInDuration = 0.1f;
     [Min(0f)] [SerializeField] private float _targetHoldDuration = 0.1f;
     [Min(0f)] [SerializeField] private float _fadeOutDuration = 0.3f;
+    [Tooltip("강조 활성화 직후와 각 반복 사이에 기다리는 시간입니다.")]
     [Min(0f)] [SerializeField] private float _repeatDelay = 0.6f;
     [Range(0f, 1f)] [SerializeField] private float _maximumAlpha = 0.9f;
 
     private Coroutine _attentionRoutine;
     private Color _configuredColor;
     private bool _attentionActive;
-    private bool _isPointerOver;
     private bool _hasValidReferences;
 
 
@@ -57,7 +56,6 @@ public sealed class TutorialButtonAttention : MonoBehaviour, IPointerEnterHandle
     private void OnDisable()
     {
         StopAttentionRoutine();
-        _isPointerOver = false;
         HideFrame();
     }
 
@@ -86,35 +84,9 @@ public sealed class TutorialButtonAttention : MonoBehaviour, IPointerEnterHandle
 
 
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        _isPointerOver = true;
-        if (!_attentionActive || !_hasValidReferences) return;
-
-        StopAttentionRoutine();
-        ApplyFrame(_targetPadding, _maximumAlpha);
-    }
-
-
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        _isPointerOver = false;
-        if (_attentionActive && _hasValidReferences && isActiveAndEnabled)
-            StartAttentionRoutine();
-    }
-
-
-
     private void StartAttentionRoutine()
     {
         StopAttentionRoutine();
-        if (_isPointerOver)
-        {
-            ApplyFrame(_targetPadding, _maximumAlpha);
-            return;
-        }
-
         _attentionRoutine = StartCoroutine(AttentionLoop());
     }
 
@@ -131,6 +103,9 @@ public sealed class TutorialButtonAttention : MonoBehaviour, IPointerEnterHandle
 
     private IEnumerator AttentionLoop()
     {
+        ApplyFrame(_outerPadding, 0f);
+        yield return WaitUnscaled(_repeatDelay);
+
         while (_attentionActive)
         {
             ApplyFrame(_outerPadding, 0f);

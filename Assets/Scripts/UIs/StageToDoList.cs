@@ -11,7 +11,7 @@ public class StageToDoList : MonoBehaviour
     private void Start()
     {
         string baseString = _mainTargetTmp.text;
-        int maxEscapeCount = GameManager.Instance.CurrentStageNum == 1 ? 2 : 4;
+        int maxEscapeCount = GameManager.Instance.CurrentStageNum == 1 ? 3 : 4;
         _mainTargetTmp.text = baseString.Replace("{n}", maxEscapeCount.ToString());
     }
 }

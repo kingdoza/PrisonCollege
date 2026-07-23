@@ -454,12 +454,6 @@ public class RushThroughPattern : PatternNode
             new SetAnimBool("Rush", true),
             //new Delay(() => 1.1f),
             new RushChargeDelayNode(4f, 6f),
-            //new SetAnimRootMotion(true),
-            new ActionNode(() => {
-                var attacker = _bb.Avatar.GetComponent<PostStudent>().GetOverlapAttacker(OverlapAttackType.BodySlam);
-                attacker.StartAttack();
-            }, NodeState.Success),
-            new PlayOnceAnim("RushStart", "RushStart"),
             new ActionNode(null, NodeState.Running),
         });
     }
@@ -519,7 +513,7 @@ public class RushChargeDelayNode : BT_Node
             return NodeState.Running;
 
         _student.CompleteRushChargeDelay();
-        ResetLocalState();
+        _student.StartRushAttackImmediately();
         return NodeState.Success;
     }
 
@@ -1271,6 +1265,7 @@ public class TacklePattern : PatternNode
 {
     private float SLIDE_RANGE = 4f;
     private bool _isTackled = false;
+    private bool _isSprintScreamStarted;
 
     public TacklePattern()
     {
@@ -1319,6 +1314,7 @@ public class TacklePattern : PatternNode
                 new Sequence(new List<BT_Node> {
                     new SetAnimRootMotion(false),
                     new SetSpeed(() => 5.67f),
+                    new ActionNode(BeginSprintScream),
                     new ParallelNode(new List<BT_Node>
                     {
                         new MoveToPlayer(),
@@ -1363,10 +1359,21 @@ public class TacklePattern : PatternNode
     }
 
 
+
+    private void BeginSprintScream()
+    {
+        if (_isSprintScreamStarted) return;
+        _bb?.soundBehavior?.PlayTackleSprintScream();
+        _isSprintScreamStarted = true;
+    }
+
+
     public override void Reset()
     {
+        _bb?.soundBehavior?.StopTackleSprintScream();
         base.Reset();
         _isTackled = false;
+        _isSprintScreamStarted = false;
     }
 }
 

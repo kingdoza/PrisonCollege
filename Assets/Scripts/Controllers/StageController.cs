@@ -131,6 +131,8 @@ public class StageController : SceneSingleton<StageController>
     protected override void Awake()
     {
         base.Awake();
+        //QualitySettings.vSyncCount = 0;
+        //Application.targetFrameRate = 30;
         _timerStat.Initialize();
         _prepareTimeStat.Initialize();
         _chaosStat.Initialize(true);

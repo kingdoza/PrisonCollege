@@ -63,8 +63,8 @@ public class SoundEmitter : MonoBehaviour
 
         if (isLongDist)
         {
-            _audioSource.minDistance = 2;
-            _audioSource.maxDistance = 40;
+            _audioSource.minDistance = 5;
+            _audioSource.maxDistance = 80;
         }
         else
         {

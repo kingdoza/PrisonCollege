@@ -20,7 +20,7 @@ MonoBehaviour:
   - _behaviorType: 4
     _chance: 10
   - _behaviorType: 8
-    _chance: 50
+    _chance: 40
   - _behaviorType: 16
     _chance: 10
   - _behaviorType: 32

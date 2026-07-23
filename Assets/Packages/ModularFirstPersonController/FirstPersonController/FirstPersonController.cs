@@ -151,6 +151,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void Awake()
     {
+        currentYaw = transform.eulerAngles.y;
         ApplyControlSettings();
         staminaCostMod = AttributeSystem.Instance.StaminaCostMod;
         professor = GetComponent<Professor>();
@@ -399,7 +400,12 @@ public class FirstPersonController : MonoBehaviour
 
     public void SetOriginYaw()
     {
-        currentYaw = 180f;
+        SetOriginYaw(180f);
+    }
+
+    public void SetOriginYaw(float originYaw)
+    {
+        currentYaw = originYaw;
     }
 
     private float currentYaw = 180f;
@@ -535,7 +541,7 @@ public class FirstPersonController : MonoBehaviour
         fov = PlayerPrefs.GetFloat("FOV", 80f);
         sprintFOV = fov + 10f;
         playerCamera.fieldOfView = fov;
-        holdToSprint = PlayerPrefs.GetInt("SprintMode", 0) == 1;
+        holdToSprint = PlayerPrefs.GetInt("SprintMode", 1) == 1;
     }
 
     public void StopSprinting()

@@ -17,11 +17,23 @@ public class SoundEmitterOwner : MonoBehaviour
 
 
 
-    public void Play3DSound(SoundData data, Transform target, bool isRandomPitch, float volumeMultiplier = 1f, bool loop = false)
+    public void Play3DSound(
+        SoundData data,
+        Transform target,
+        bool isRandomPitch,
+        float volumeMultiplier = 1f,
+        bool loop = false,
+        bool isLongDistance = false)
     {
         if (data == null) return;
         if (_activeEmitters.ContainsKey(data)) return;
-        SoundEmitter emitter = SoundUtils.PlayOwnedScene3DSFX(data, target.position, isRandomPitch, volumeMultiplier, loop);
+        SoundEmitter emitter = SoundUtils.PlayOwnedScene3DSFX(
+            data,
+            target.position,
+            isRandomPitch,
+            volumeMultiplier,
+            loop,
+            isLongDistance);
 
         if (emitter != null)
         {

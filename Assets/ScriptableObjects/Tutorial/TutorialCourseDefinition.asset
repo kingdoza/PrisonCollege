@@ -193,5 +193,5 @@ MonoBehaviour:
       \uC18D\uB3C4\uAC00 \uB290\uB824\uC9D1\uB2C8\uB2E4."
   _workConfirmationSeconds: 5
   _miniWaveDuration: 40
-  _miniWaveEscapeFailureThreshold: 4
+  _miniWaveEscapeFailureThreshold: 3
   _miniWaveStudentCount: 4

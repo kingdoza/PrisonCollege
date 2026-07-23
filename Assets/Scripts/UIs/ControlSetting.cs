@@ -32,7 +32,7 @@ public class ControlSetting : MonoBehaviour
         // 1. 기존 설정값 로드 (0: 홀드, 1: 토글)
         float savedSens = PlayerPrefs.GetFloat("MouseSensitivity", 3.0f);
         float savedFov = PlayerPrefs.GetFloat("FOV", 80);
-        int savedSprintMode = PlayerPrefs.GetInt("SprintMode", 0);
+        int savedSprintMode = PlayerPrefs.GetInt("SprintMode", 1);
 
         // 2. UI 초기 설정
         _mouseSensitivitySlider.value = savedSens;

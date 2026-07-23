@@ -3733,7 +3733,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 488034461}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 286695063}
 --- !u!114 &88851698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5163,7 +5163,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1775235188}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 1682540070}
 --- !u!114 &132195528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5972,6 +5972,7 @@ Transform:
   - {fileID: 537774174}
   - {fileID: 1022833433}
   - {fileID: 1681625386}
+  - {fileID: 1049198861}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &154048770
@@ -7890,6 +7891,80 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1001 &204998298
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2108385098}
+    m_Modifications:
+    - target: {fileID: 334633525227680070, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: _canvas
+      value: 
+      objectReference: {fileID: 371194774}
+    - target: {fileID: 334633525227680070, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: _target
+      value: 
+      objectReference: {fileID: 1726108663}
+    - target: {fileID: 334633525227680070, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: _boundsRect
+      value: 
+      objectReference: {fileID: 2108385098}
+    - target: {fileID: 334633525227680070, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: _worldCamera
+      value: 
+      objectReference: {fileID: 2130155690}
+    - target: {fileID: 3273115381656494595, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_Name
+      value: FuseBoxMarker
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+--- !u!224 &204998299 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5508395974697848714, guid: 952d6ca029fa67341bbb9a4830b30040, type: 3}
+  m_PrefabInstance: {fileID: 204998298}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &220273069
 GameObject:
   m_ObjectHideFlags: 0
@@ -9574,7 +9649,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 154048770}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 1049198862}
 --- !u!114 &266664272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10420,6 +10495,96 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1001 &286695061
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 488034462}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &286695062 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 286695061}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &286695063 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 286695061}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
+--- !u!1001 &287102609
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1750305580}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &287102610 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 287102609}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &287102611 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 287102609}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!1 &287809769
 GameObject:
   m_ObjectHideFlags: 0
@@ -13539,6 +13704,51 @@ Transform:
   - {fileID: 1786643058}
   m_Father: {fileID: 488034462}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!1001 &339347020
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1007151407}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &339347021 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 339347020}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &339347022 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 339347020}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!1 &339830211
 GameObject:
   m_ObjectHideFlags: 0
@@ -13918,7 +14128,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 300, y: 0}
+  m_AnchoredPosition: {x: 150, y: 0}
   m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &342415726
@@ -25758,6 +25968,7 @@ Transform:
   - {fileID: 917382202}
   - {fileID: 1465640122}
   - {fileID: 1286525905}
+  - {fileID: 286695062}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 295.453, z: 0}
 --- !u!1 &488760703
@@ -32396,7 +32607,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 644365261}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 1013636933}
 --- !u!114 &610093600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33456,6 +33667,7 @@ Transform:
   - {fileID: 951835572}
   - {fileID: 569263353}
   - {fileID: 1763733611}
+  - {fileID: 1676014085}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &631348630
@@ -34847,6 +35059,7 @@ Transform:
   - {fileID: 1458339450}
   - {fileID: 1761791502}
   - {fileID: 1635955792}
+  - {fileID: 1013636932}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &644365261
@@ -37327,7 +37540,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: 0}
+  m_AnchoredPosition: {x: 300, y: 0}
   m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &709562340
@@ -37501,7 +37714,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1007151408}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 339347022}
 --- !u!114 &714380642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44601,7 +44814,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 631348630}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 1676014086}
 --- !u!114 &864151293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54781,6 +54994,7 @@ Transform:
   - {fileID: 658669820}
   - {fileID: 1279821633}
   - {fileID: 1851844651}
+  - {fileID: 339347021}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
 --- !u!114 &1007151408
@@ -55090,6 +55304,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1013068050}
   m_CullTransparentMesh: 1
+--- !u!1001 &1013636931
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 644365260}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &1013636932 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1013636931}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1013636933 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1013636931}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!43 &1018055327
 Mesh:
   m_ObjectHideFlags: 0
@@ -56739,6 +56998,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1048811831}
   m_CullTransparentMesh: 1
+--- !u!1001 &1049198860
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 154048769}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &1049198861 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1049198860}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1049198862 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1049198860}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!1 &1049315878
 GameObject:
   m_ObjectHideFlags: 0
@@ -88684,6 +88988,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1676014084
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 631348629}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &1676014085 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1676014084}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1676014086 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1676014084}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!1 &1677172445
 GameObject:
   m_ObjectHideFlags: 0
@@ -89144,6 +89493,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1682444950}
   m_CullTransparentMesh: 1
+--- !u!1001 &1682540068
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1775235187}
+    m_Modifications:
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9027514048236820045, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+      propertyPath: m_Name
+      value: HackingVfx
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+--- !u!4 &1682540069 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9027514048236820042, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1682540068}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1682540070 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4628006497753579142, guid: 4da38865d60387641ab4213cb43c29e5, type: 3}
+  m_PrefabInstance: {fileID: 1682540068}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017d2440f6e44e2180b616542ca562ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HackingVfxController
 --- !u!1 &1685244425
 GameObject:
   m_ObjectHideFlags: 0
@@ -92287,6 +92681,7 @@ Transform:
   - {fileID: 949011968}
   - {fileID: 558692222}
   - {fileID: 1726420763}
+  - {fileID: 287102610}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1750305581
@@ -93210,6 +93605,7 @@ Transform:
   - {fileID: 1830560056}
   - {fileID: 917235634}
   - {fileID: 552195239}
+  - {fileID: 1682540069}
   m_Father: {fileID: 1917423286}
   m_LocalEulerAnglesHint: {x: 0, y: 115.453, z: 0}
 --- !u!114 &1775235188
@@ -96664,6 +97060,64 @@ RectTransform:
   m_AnchoredPosition: {x: -277.77783, y: 0}
   m_SizeDelta: {x: 300, y: 68}
   m_Pivot: {x: 0, y: 1}
+--- !u!1001 &1825878705
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2108385098}
+    m_Modifications:
+    - target: {fileID: 2266146675820048997, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_Name
+      value: HitMarker
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+--- !u!224 &1825878706 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6592963546864203494, guid: 0ad46a44417ef9c4bb2a00939b4b7d62, type: 3}
+  m_PrefabInstance: {fileID: 1825878705}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1828283594
 GameObject:
   m_ObjectHideFlags: 0
@@ -107883,7 +108337,7 @@ MonoBehaviour:
   _behaviorTypes: 769
   _occupant: {fileID: 0}
   _monitor: {fileID: 1750305581}
-  _hackingVfx: {fileID: 0}
+  _hackingVfx: {fileID: 287102611}
 --- !u!114 &2040267296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110414,6 +110868,8 @@ RectTransform:
   - {fileID: 1247036156}
   - {fileID: 518628466}
   - {fileID: 949146635}
+  - {fileID: 204998299}
+  - {fileID: 1825878706}
   - {fileID: 892377392}
   - {fileID: 1040967970}
   - {fileID: 1213237711}

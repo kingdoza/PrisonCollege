@@ -44893,6 +44893,7 @@ Transform:
   - {fileID: 3642679977363119944}
   - {fileID: 685413522745772516}
   - {fileID: 7308232374847418441}
+  - {fileID: 1993948476986907782}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &7190194764105649731
@@ -44978,6 +44979,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bodyOverlapAttacker: {fileID: 985412796123765829}
   _tackleOverlapAttacker: {fileID: 2231734742649661367}
+  _rushHitDelayMin: 0.3
+  _rushHitDelayMax: 0.5
+  _rushChargeVfx: {fileID: 5721333861725498132}
   DieEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -45441,6 +45445,8 @@ MonoBehaviour:
   _badSongSD: {fileID: 11400000, guid: 5ab7e17986d28b047841a95cb4a0444d, type: 2}
   _hurtSD: {fileID: 11400000, guid: cb76c2cd6c9abcf41b1b1cc65929c32a, type: 2}
   _sleepSD: {fileID: 11400000, guid: cb2237068b7bc8f449fb0bfdf2725bc4, type: 2}
+  _tackleSprintScreamSD: {fileID: 11400000, guid: b33c063b327ea1a44ae8726e45b009e7, type: 2}
+  _rushChargeStartSD: {fileID: 11400000, guid: c450b0724eb691246884fc32bf09b213, type: 2}
 --- !u!114 &-7157213746737882068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57266,7 +57272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 7.5
+  _maxStat: 7
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -63478,3 +63484,48 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &5168801820866533438
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4647855085790278921}
+    m_Modifications:
+    - target: {fileID: 3366188799792012545, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+      propertyPath: m_Name
+      value: RushChargeVfx
+      objectReference: {fileID: 0}
+    - target: {fileID: 6633987302200181944, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6633987302200181944, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6633987302200181944, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+--- !u!4 &1993948476986907782 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6633987302200181944, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+  m_PrefabInstance: {fileID: 5168801820866533438}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5721333861725498132 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 638674467235279658, guid: 524a80236e5148b419814dd3df4f27ca, type: 3}
+  m_PrefabInstance: {fileID: 5168801820866533438}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6e7b7ff1a2b4d13932404a7fcdf1566, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RushChargeVfxController

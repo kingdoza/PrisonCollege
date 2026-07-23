@@ -8,7 +8,10 @@ public class MainScreen : MonoBehaviour
     [SerializeField] private SimplePanel _exitCheckPanel;
     [Tooltip("튜토리얼 버튼에 부착한 최초 실행 안내 효과입니다. 연결하지 않아도 버튼 기능은 유지됩니다.")]
     [SerializeField] private TutorialButtonAttention _tutorialButtonAttention;
+    [Tooltip("Start 버튼을 처음 누를 때 재생할 메인 메뉴 인트로입니다.")]
+    [SerializeField] private MainMenuIntroPresenter _introPresenter;
 
+    private bool _isIntroFlowRunning;
 
 
     private void Awake()
@@ -48,6 +51,44 @@ public class MainScreen : MonoBehaviour
 
 
     public void Start_Btn()
+    {
+        if (_isIntroFlowRunning) return;
+        if (IntroPlaybackState.HasStartedOnce)
+        {
+            OpenStageSelect();
+            return;
+        }
+
+        if (_introPresenter == null)
+        {
+            Debug.LogError("MainScreen의 Intro Presenter 참조가 누락됐습니다. 인트로를 건너뛰고 스테이지 선택창을 엽니다.", this);
+            OpenStageSelect();
+            return;
+        }
+
+        _isIntroFlowRunning = true;
+        if (!_introPresenter.Play(OnIntroCompleted))
+        {
+            OnIntroCompleted();
+            return;
+        }
+
+        IntroPlaybackState.MarkStartedOnce();
+    }
+
+
+
+    private void OnIntroCompleted()
+    {
+        if (!_isIntroFlowRunning) return;
+
+        _isIntroFlowRunning = false;
+        OpenStageSelect();
+    }
+
+
+
+    private void OpenStageSelect()
     {
         EscapeInputSystem.Instance.EnablePanel(_stageSelectPanel);
     }

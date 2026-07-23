@@ -79,6 +79,8 @@ public class PostStudent : MonoBehaviour
     private float _rushHitDelayMin;
     [SerializeField, Min(0f), Tooltip("Maximum delay added per actual damage hit while charging a rush.")]
     private float _rushHitDelayMax;
+    [SerializeField, Tooltip("Optional per-student VFX controller for rush charging. Normal rush behavior is unchanged when unassigned.")]
+    private RushChargeVfxController _rushChargeVfx;
 
     private bool _isRushCharging;
     private float _rushChargeBaseDuration;
@@ -386,6 +388,8 @@ public class PostStudent : MonoBehaviour
 
         _rushChargeBaseDuration = Mathf.Max(0f, baseDuration);
         _isRushCharging = true;
+        _rushChargeVfx?.BeginCharge(_rushChargeBaseDuration);
+        _soundBehavior?.PlayRushChargeStart();
         return true;
     }
 
@@ -396,16 +400,40 @@ public class PostStudent : MonoBehaviour
         if (!_isRushCharging) return false;
 
         _rushChargeElapsed += Mathf.Max(0f, deltaTime);
+        _rushChargeVfx?.TickCharge(deltaTime);
         return _rushChargeElapsed >= _rushChargeBaseDuration + _rushChargeAddedDelay;
     }
 
 
 
-    public void CompleteRushChargeDelay() => ClearRushChargeDelay();
+    public void CompleteRushChargeDelay()
+    {
+        if (!_isRushCharging) return;
+
+        _rushChargeVfx?.HoldAtCompletion();
+        ClearRushChargeDelay(false);
+    }
 
 
 
     public void CancelRushChargeDelay() => ClearRushChargeDelay();
+
+
+
+    public void NotifyRushAttackStarted()
+    {
+        _rushChargeVfx?.StopAndClear();
+        _soundBehavior?.StopRushChargeStart();
+    }
+
+
+
+    public void StartRushAttackImmediately()
+    {
+        NotifyRushAttackStarted();
+        _anim.Play("Base Layer.RushStart", 0, 0f);
+        _bodyOverlapAttacker.StartAttack();
+    }
 
 
 
@@ -422,12 +450,19 @@ public class PostStudent : MonoBehaviour
             : UnityEngine.Random.Range(minDelay, maxDelay);
         _rushChargeAddedDelay += addedDelay;
         _rushChargeDelayHitCount++;
+        _rushChargeVfx?.ApplyHitDelay(addedDelay);
     }
 
 
 
-    private void ClearRushChargeDelay()
+    private void ClearRushChargeDelay(bool stopChargePresentation = true)
     {
+        if (stopChargePresentation)
+        {
+            _rushChargeVfx?.StopAndClear();
+            _soundBehavior?.StopRushChargeStart();
+        }
+
         _isRushCharging = false;
         _rushChargeBaseDuration = 0f;
         _rushChargeElapsed = 0f;
@@ -1027,6 +1062,7 @@ public class PostStudent : MonoBehaviour
     private void CleanupCurrentBehaviorRuntime()
     {
         ClearRushChargeDelay();
+        _soundBehavior?.StopTackleSprintScream();
         DOTween.Kill(this);
         if (_blackboard != null)
         {
@@ -1369,6 +1405,7 @@ public class PostStudent : MonoBehaviour
     private void ResetTutorialAnimationAndAttachments()
     {
         ClearRushChargeDelay();
+        _soundBehavior?.StopTackleSprintScream();
         StopTutorialCheerAnimation(false);
         StopAllOverlapAttackers();
         HideAllAnimAttachments();
@@ -1508,6 +1545,7 @@ public class PostStudent : MonoBehaviour
     {
         if (SuppressScriptedWorldConsequences) return;
         ClearRushChargeDelay();
+        _soundBehavior?.StopTackleSprintScream();
         EscapeEvent?.Invoke(this);
         _blackboard.destSpot?.Release(this);
         gameObject.SetActive(false);
@@ -1519,6 +1557,7 @@ public class PostStudent : MonoBehaviour
     private void OnDie(HitInfo hitInfo)
     {
         ClearRushChargeDelay();
+        _soundBehavior?.StopTackleSprintScream();
         DieEvent?.Invoke(this, hitInfo);
 
         GameObject playerObject = _blackboard.Player.gameObject;
@@ -1619,6 +1658,7 @@ public class PostStudent : MonoBehaviour
     private void OnDie(Vector3 hitPoint, Quaternion hitRotation, float impulse, GameObject killer)
     {
         ClearRushChargeDelay();
+        _soundBehavior?.StopTackleSprintScream();
         _root = null;
         _agent.speed = 0;
         _anim.enabled = false;

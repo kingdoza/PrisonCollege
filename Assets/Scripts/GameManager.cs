@@ -183,9 +183,13 @@ public class GameManager : PersistentSingleton<GameManager>
 
 
 
-    private void PlayNextBGM()
+    public void PlayNextBGM()
     {
+        if (_bgmEmitter == null) return;
 
+        SoundEmitter currentEmitter = _bgmEmitter;
+        _bgmEmitter = null;
+        currentEmitter.StopAndReturn();
     }
 
 

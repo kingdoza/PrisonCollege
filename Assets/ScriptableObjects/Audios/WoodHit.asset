@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundData
   soundInfos:
   - clip: {fileID: 8300000, guid: e900c3014665e3746b2a0f2e947a4749, type: 3}
-    volumeMultiplier: 1
+    volumeMultiplier: 2
   - clip: {fileID: 8300000, guid: 9ea68c4f21d64604aa2ef71ec2b01688, type: 3}
-    volumeMultiplier: 1
+    volumeMultiplier: 2
   - clip: {fileID: 8300000, guid: 14d9d479ae2958348b7922e6c1043ea6, type: 3}
-    volumeMultiplier: 1
+    volumeMultiplier: 2
   - clip: {fileID: 8300000, guid: 9f0c7c33dd304c5468ba7a92aedcd681, type: 3}
-    volumeMultiplier: 1
+    volumeMultiplier: 2
   baseVolume: 4

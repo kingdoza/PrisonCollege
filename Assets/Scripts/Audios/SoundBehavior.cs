@@ -8,6 +8,8 @@ public class SoundBehavior : MonoBehaviour
     [SerializeField] private SoundData _badSongSD;
     [SerializeField] private SoundData _hurtSD;
     [SerializeField] private SoundData _sleepSD;
+    [SerializeField] private SoundData _tackleSprintScreamSD;
+    [SerializeField] private SoundData _rushChargeStartSD;
 
     private SoundEmitterOwner _soundEmitterOwner;
 
@@ -48,6 +50,46 @@ public class SoundBehavior : MonoBehaviour
     public void PlayHurt()
     {
         _soundEmitterOwner.Play3DSound(_hurtSD, _headBone, false);
+    }
+
+
+
+    public void PlayTackleSprintScream()
+    {
+        if (_soundEmitterOwner == null || _headBone == null) return;
+        _soundEmitterOwner.Play3DSound(_tackleSprintScreamSD, _headBone, true);
+    }
+
+
+
+    public void StopTackleSprintScream()
+    {
+        if (_soundEmitterOwner == null)
+            _soundEmitterOwner = GetComponent<SoundEmitterOwner>();
+        _soundEmitterOwner?.StopSound(_tackleSprintScreamSD);
+    }
+
+
+
+    public void PlayRushChargeStart()
+    {
+        if (_soundEmitterOwner == null || _headBone == null) return;
+        _soundEmitterOwner.Play3DSound(
+            _rushChargeStartSD,
+            _headBone,
+            true,
+            volumeMultiplier: 1f,
+            loop: false,
+            isLongDistance: true);
+    }
+
+
+
+    public void StopRushChargeStart()
+    {
+        if (_soundEmitterOwner == null)
+            _soundEmitterOwner = GetComponent<SoundEmitterOwner>();
+        _soundEmitterOwner?.StopSound(_rushChargeStartSD);
     }
 
 

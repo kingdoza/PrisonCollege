@@ -15,4 +15,4 @@ MonoBehaviour:
   soundInfos:
   - clip: {fileID: 8300000, guid: 52a020b99d191554881ae344da1797f6, type: 3}
     volumeMultiplier: 1
-  baseVolume: 0.5
+  baseVolume: 0.4
