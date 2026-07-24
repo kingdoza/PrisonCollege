@@ -10,6 +10,8 @@ public class MainScreen : MonoBehaviour
     [SerializeField] private TutorialButtonAttention _tutorialButtonAttention;
     [Tooltip("Start 버튼을 처음 누를 때 재생할 메인 메뉴 인트로입니다.")]
     [SerializeField] private MainMenuIntroPresenter _introPresenter;
+    [Tooltip("메인 메뉴 버튼을 위에서부터 차례대로 등장시키는 Presenter입니다. 연결하지 않으면 기존처럼 즉시 조작할 수 있습니다.")]
+    [SerializeField] private MainMenuButtonEntrancePresenter _buttonEntrancePresenter;
 
     private bool _isIntroFlowRunning;
 
@@ -31,6 +33,25 @@ public class MainScreen : MonoBehaviour
         _membersPanel.Hide();
         _exitCheckPanel.Hide();
 
+        if (_tutorialButtonAttention != null)
+            _tutorialButtonAttention.SetAttentionActive(false);
+
+        bool entranceStarted = _buttonEntrancePresenter != null &&
+            _buttonEntrancePresenter.Play(ActivateTutorialAttention);
+        if (!entranceStarted)
+            ActivateTutorialAttention();
+
+        if (GameManager.Instance.hasToStageSelect == true)
+        {
+            GameManager.Instance.hasToStageSelect = false;
+            EscapeInputSystem.Instance.EnablePanel(_stageSelectPanel);
+        }
+    }
+
+
+
+    private void ActivateTutorialAttention()
+    {
         bool shouldShowTutorialAttention = !TutorialLaunchState.HasStartedOnce;
         if (_tutorialButtonAttention != null)
         {
@@ -39,12 +60,6 @@ public class MainScreen : MonoBehaviour
         else if (shouldShowTutorialAttention)
         {
             Debug.LogWarning("최초 튜토리얼 실행 안내를 표시할 TutorialButtonAttention 참조가 없습니다.", this);
-        }
-
-        if (GameManager.Instance.hasToStageSelect == true)
-        {
-            GameManager.Instance.hasToStageSelect = false;
-            EscapeInputSystem.Instance.EnablePanel(_stageSelectPanel);
         }
     }
 
