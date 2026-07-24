@@ -35,6 +35,9 @@ public class Professor : MonoBehaviour, IAttackable
     public WeaponController WeaponController => _weaponController;
     public float CurrentHealth => _health != null ? _health.Current : 0f;
     public float CurrentStamina => _stamina != null ? _stamina.Current : 0f;
+    public float StaminaRatio => _stamina != null && _stamina.Max > 0f
+        ? _stamina.Current / _stamina.Max
+        : 0f;
 
     private void Awake()
     {

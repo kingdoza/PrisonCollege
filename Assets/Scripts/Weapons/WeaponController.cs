@@ -30,6 +30,12 @@ public class WeaponController : MonoBehaviour
         : null;
     public int WeaponCount => _weapons == null ? 0 : _weapons.Length;
     public int CurrentIndex => _currentIdx;
+    public WeaponBase GetWeaponAt(int index)
+    {
+        return _weapons != null && index >= 0 && index < _weapons.Length
+            ? _weapons[index]
+            : null;
+    }
     public GameObject Owner { private set; get; }
     private bool isHiding = false;
     public bool IsHiding => isHiding;
