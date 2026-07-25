@@ -396,6 +396,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 5229303215484463158}
   _throwSD: {fileID: 0}
 --- !u!114 &438336310255340909
@@ -636,8 +637,9 @@ MonoBehaviour:
   _idleBobSpeed: 2
   _walkBobAmount: 0.003
   _walkBobSpeed: 10
-  _swayAmount: 0.01
+  _swayAmount: 0.003
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _kickBackZ: 0.1
   _kickUpX: 4
   _randomMaxYaw: 2
@@ -862,6 +864,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 4252409437884609164}
   _throwSD: {fileID: 0}
 --- !u!114 &708413108444540629
@@ -971,6 +974,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _swingSD: {fileID: 11400000, guid: 3e45e8293d93f99408079a8211f69294, type: 2}
 --- !u!114 &3167642016219194372
 MonoBehaviour:
@@ -1507,6 +1511,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _swingSD: {fileID: 11400000, guid: 3e45e8293d93f99408079a8211f69294, type: 2}
 --- !u!114 &1699236111596400660
 MonoBehaviour:
@@ -16628,6 +16633,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 5726194051996564760}
   _throwSD: {fileID: 0}
 --- !u!114 &7418440958500227685
@@ -21643,6 +21649,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 2427073248269798698}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!114 &1318551753994443717
@@ -31763,6 +31770,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 6633267168995297568}
   _throwSD: {fileID: 0}
 --- !u!114 &5519859335208552857
@@ -31878,6 +31886,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 2530652673502554340}
   _throwSD: {fileID: 0}
 --- !u!114 &5915151207430275528
@@ -31987,6 +31996,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 6706386987484614344}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!114 &207584407078468977
@@ -32102,6 +32112,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 3879636325847696879}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!114 &3459557181755715738
@@ -42278,6 +42289,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 8370675078488243576}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!114 &278564527753383748
@@ -42391,6 +42403,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.02
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
 --- !u!114 &6449519920880279402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42461,6 +42474,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 4831843883168302346}
   _throwSD: {fileID: 0}
 --- !u!114 &5183548553539288007
@@ -47566,6 +47580,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 5110677853539182435}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!114 &7535318462532767147
@@ -67452,6 +67467,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _kickBackZ: 0.1
   _kickUpX: 4
   _randomMaxYaw: 2

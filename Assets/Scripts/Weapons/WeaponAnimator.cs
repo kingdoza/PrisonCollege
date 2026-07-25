@@ -15,6 +15,8 @@ public class WeaponAnimator : MonoBehaviour
     [Header("--- Mouse Sway ---")]
     [SerializeField] private float _swayAmount = 0.02f;
     [SerializeField] private float _smoothAmount = 6f;
+    [Tooltip("기존 Sway 감각을 보존할 기준 프레임입니다. 마우스 델타를 이 프레임 기준 값으로 정규화합니다.")]
+    [SerializeField, Min(1f)] private float _swayReferenceFrameRate = 60f;
     [Header("--- Attack ---")]
     //[SerializeField] protected float _attackDuration = 1f;
 
@@ -83,17 +85,20 @@ public class WeaponAnimator : MonoBehaviour
     {
         float mouseX = 0;
         float mouseY = 0;
-        if (_weaponController.FirstPersonController != null)
+        float deltaTime = Time.deltaTime;
+        if (_weaponController.FirstPersonController != null && deltaTime > 0f)
         {
-            mouseX = -Input.GetAxis("Mouse X") * _swayAmount;
-            mouseY = -Input.GetAxis("Mouse Y") * _swayAmount;
+            float referenceFrameDelta = deltaTime * Mathf.Max(1f, _swayReferenceFrameRate);
+            mouseX = -Input.GetAxis("Mouse X") / referenceFrameDelta * _swayAmount;
+            mouseY = -Input.GetAxis("Mouse Y") / referenceFrameDelta * _swayAmount;
 
         }
 
         Vector3 targetPos = _originPos + _currentBobOffset + new Vector3(mouseX, mouseY, 0);
         
         // 모든 움직임을 합쳐서 최종적으로 한 번만 Lerp (끊김 방지의 핵심)
-        transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, Time.deltaTime * _smoothAmount);
+        float smoothingFactor = 1f - Mathf.Exp(-Mathf.Max(0f, _smoothAmount) * deltaTime);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, smoothingFactor);
     }
 
     // Sprint 포즈 전환 시에는 DOTween을 사용하되, _originPos 자체를 옮겨주는 게 안전합니다.

@@ -24,7 +24,7 @@ public class StageWeaponSlotView : MonoBehaviour
     [SerializeField] private Color _depletedCurrentTextColor = Color.red;
 
     [Header("Selection")]
-    [Tooltip("선택 시 세로로 커질 패널입니다. 위아래 확장은 Pivot Y를 0.5로 설정하세요.")]
+    [Tooltip("세로 Stretch 패널을 연결합니다. 선택 시 원래 Top/Bottom Offset을 기준으로 위아래가 같은 양만큼 확장됩니다.")]
     [SerializeField] private RectTransform _selectionHeightTarget;
     [SerializeField, Min(0f)] private float _selectedHeightIncrease = 24f;
     [SerializeField, Min(0f)] private float _selectionAnimationDuration = 0.15f;
@@ -32,11 +32,14 @@ public class StageWeaponSlotView : MonoBehaviour
     private Color _originalFillColor;
     private Color _originalStateColor;
     private float _originalFillAmount;
-    private float _normalHeight;
-    private float _heightFrom;
-    private float _heightTo;
-    private float _heightElapsed;
-    private bool _heightAnimating;
+    private float _normalBottomOffset;
+    private float _normalTopOffset;
+    private float _bottomOffsetFrom;
+    private float _bottomOffsetTo;
+    private float _topOffsetFrom;
+    private float _topOffsetTo;
+    private float _offsetAnimationElapsed;
+    private bool _offsetAnimating;
     private bool _isSelected;
     private bool _hasWeaponContent;
     private bool _hasSelectionState;
@@ -59,7 +62,8 @@ public class StageWeaponSlotView : MonoBehaviour
             _originalFillColor = _ammunitionFill.color;
             _originalStateColor = _ammunitionStateImage.color;
             _originalFillAmount = _ammunitionFill.fillAmount;
-            _normalHeight = _selectionHeightTarget.rect.height;
+            _normalBottomOffset = _selectionHeightTarget.offsetMin.y;
+            _normalTopOffset = _selectionHeightTarget.offsetMax.y;
         }
 
         bool empty = weapon == null || weapon is EmptyWeapon || _itemSlot.Item == null;
@@ -76,9 +80,9 @@ public class StageWeaponSlotView : MonoBehaviour
     {
         if (!_hasSelectionState) return;
 
-        _heightAnimating = false;
+        _offsetAnimating = false;
         _hasWeaponContent = false;
-        SetHeight(_normalHeight);
+        SetVerticalOffsets(_normalBottomOffset, _normalTopOffset);
         _weaponNameText.gameObject.SetActive(false);
         _ammunitionText.gameObject.SetActive(false);
         _ammunitionFill.color = _originalFillColor;
@@ -90,7 +94,7 @@ public class StageWeaponSlotView : MonoBehaviour
     private void Update()
     {
         if (_hasSelectionState)
-            UpdateHeightAnimation();
+            UpdateOffsetAnimation();
     }
 
     private void RefreshContent(WeaponBase weapon, bool empty)
@@ -147,34 +151,45 @@ public class StageWeaponSlotView : MonoBehaviour
         _weaponNameText.gameObject.SetActive(selected && _hasWeaponContent);
         _ammunitionText.gameObject.SetActive(selected && _hasWeaponContent);
 
-        float targetHeight = _normalHeight + (selected ? _selectedHeightIncrease : 0f);
+        float halfIncrease = selected ? _selectedHeightIncrease * 0.5f : 0f;
+        float targetBottomOffset = _normalBottomOffset - halfIncrease;
+        float targetTopOffset = _normalTopOffset + halfIncrease;
         if (immediate || _selectionAnimationDuration <= 0f)
         {
-            _heightAnimating = false;
-            SetHeight(targetHeight);
+            _offsetAnimating = false;
+            SetVerticalOffsets(targetBottomOffset, targetTopOffset);
             return;
         }
 
-        _heightFrom = _selectionHeightTarget.rect.height;
-        _heightTo = targetHeight;
-        _heightElapsed = 0f;
-        _heightAnimating = true;
+        _bottomOffsetFrom = _selectionHeightTarget.offsetMin.y;
+        _bottomOffsetTo = targetBottomOffset;
+        _topOffsetFrom = _selectionHeightTarget.offsetMax.y;
+        _topOffsetTo = targetTopOffset;
+        _offsetAnimationElapsed = 0f;
+        _offsetAnimating = true;
     }
 
-    private void UpdateHeightAnimation()
+    private void UpdateOffsetAnimation()
     {
-        if (!_heightAnimating) return;
+        if (!_offsetAnimating) return;
 
-        _heightElapsed += Time.unscaledDeltaTime;
-        float t = Mathf.Clamp01(_heightElapsed / _selectionAnimationDuration);
+        _offsetAnimationElapsed += Time.unscaledDeltaTime;
+        float t = Mathf.Clamp01(_offsetAnimationElapsed / _selectionAnimationDuration);
         float eased = 1f - Mathf.Pow(1f - t, 3f);
-        SetHeight(Mathf.LerpUnclamped(_heightFrom, _heightTo, eased));
+        SetVerticalOffsets(
+            Mathf.LerpUnclamped(_bottomOffsetFrom, _bottomOffsetTo, eased),
+            Mathf.LerpUnclamped(_topOffsetFrom, _topOffsetTo, eased));
         if (t >= 1f)
-            _heightAnimating = false;
+            _offsetAnimating = false;
     }
 
-    private void SetHeight(float height)
+    private void SetVerticalOffsets(float bottom, float top)
     {
-        _selectionHeightTarget.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        Vector2 offsetMin = _selectionHeightTarget.offsetMin;
+        Vector2 offsetMax = _selectionHeightTarget.offsetMax;
+        offsetMin.y = bottom;
+        offsetMax.y = top;
+        _selectionHeightTarget.offsetMin = offsetMin;
+        _selectionHeightTarget.offsetMax = offsetMax;
     }
 }

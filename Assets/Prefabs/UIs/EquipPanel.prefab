@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1478137716449752792}
   - component: {fileID: 1942070601575468072}
   m_Layer: 5
-  m_Name: Image
+  m_Name: WeaponIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -142,8 +142,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 00fec740f35c6424a80b04759476dd17, type: 2}
-  m_sharedMaterial: {fileID: 3196442768583695492, guid: 00fec740f35c6424a80b04759476dd17, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: bd9aa6def0ef1a34ebd556a91870177e, type: 2}
+  m_sharedMaterial: {fileID: 3196442768583695492, guid: bd9aa6def0ef1a34ebd556a91870177e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 1388768373625504046}
   - component: {fileID: 7722769803651021146}
   m_Layer: 5
-  m_Name: Image
+  m_Name: AmmoFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,7 +282,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
+  m_SizeDelta: {x: -24, y: -24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1388768373625504046
 CanvasRenderer:
@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0, a: 0.11764706}
+  m_Color: {r: 1, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -356,7 +356,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -29}
+  m_AnchoredPosition: {x: 0, y: -26}
   m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1364892867967980424
@@ -414,8 +414,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 55
-  m_fontSizeBase: 55
+  m_fontSize: 65
+  m_fontSizeBase: 65
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -710,7 +710,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 313693281470711114, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 140
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 313693281470711114, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -784,8 +784,53 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 313693281470711114, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 576336836420817398}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 716014034172460619, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 525222435862623562}
   m_SourcePrefab: {fileID: 100100000, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
+--- !u!114 &1379255254245995058 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8883765571074028309, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
+  m_PrefabInstance: {fileID: 7524777133635928359}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!1 &7026365384702902124 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 716014034172460619, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
+  m_PrefabInstance: {fileID: 7524777133635928359}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &525222435862623562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7026365384702902124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c958a1b9fb0df541974c3badf2e983f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageWeaponSlotView
+  _itemSlot: {fileID: 0}
+  _weaponIcon: {fileID: 1942070601575468072}
+  _ammunitionFill: {fileID: 7722769803651021146}
+  _ammunitionStateImage: {fileID: 1379255254245995058}
+  _weaponNameText: {fileID: 8438793397338762803}
+  _ammunitionText: {fileID: 6837283711792775772}
+  _availableFillColor: {r: 0.2, g: 0.8, b: 0.35, a: 0.11764706}
+  _depletedFillColor: {r: 0.9, g: 0.15, b: 0.15, a: 0.11764706}
+  _availableStateColor: {r: 0.1, g: 0.55, b: 0.25, a: 1}
+  _depletedStateColor: {r: 0.55, g: 0.05, b: 0.05, a: 1}
+  _depletedCurrentTextColor: {r: 1, g: 0, b: 0, a: 1}
+  _selectionHeightTarget: {fileID: 7797726086508774509}
+  _selectedHeightIncrease: 150
+  _selectionAnimationDuration: 0.15
 --- !u!224 &7797726086508774509 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 313693281470711114, guid: 6a0a99ef1cf43d64ab9cec53b875b74c, type: 3}
