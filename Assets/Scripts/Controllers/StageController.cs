@@ -23,6 +23,7 @@ public class StageController : SceneSingleton<StageController>
     [SerializeField] private Image _projectProgressBar;
     [SerializeField] private List<ItemSlot> _equipSlotList;
     [SerializeField] private MenuPanel _menuPanel;
+    [SerializeField] private StagePauseMenuPanel _stagePauseMenuPanel;
     [SerializeField] private TextMeshProUGUI _prepareTimerTmp;
     [SerializeField] private CanvasGroup _preparePanelGroup;
     [SerializeField] private CanvasGroup _topPanelGroup;
@@ -198,7 +199,14 @@ public class StageController : SceneSingleton<StageController>
         }
         //if (WaveSystem.Instance.CurrentWave <= 0)
         //    WaveSystem.Instance.NewWaveEntered();
-        _menuPanel.Init();
+        if (_stagePauseMenuPanel == null
+            || !_stagePauseMenuPanel.InitializeNormal(
+                GameManager.Instance.StageTitle,
+                WaveSystem.Instance.CurrentWave,
+                GameManager.Instance.Difficulty == DifficultyLevel.Hard))
+        {
+            _menuPanel?.Init();
+        }
         _waveTmp.text = $"¿þÀÌºê {WaveSystem.Instance.CurrentWave}";
         InventorySystem.Instance.FillEquipSlots(_equipSlotList);
 
@@ -261,7 +269,11 @@ public class StageController : SceneSingleton<StageController>
             _waveTmp.gameObject.SetActive(true);
         }
         if (_escapeTmp != null) _escapeTmp.gameObject.SetActive(true);
-        _menuPanel?.InitTutorial(_runtimeConfig.TutorialStageTitle);
+        if (_stagePauseMenuPanel == null
+            || !_stagePauseMenuPanel.InitializeTutorial(_runtimeConfig.TutorialStageTitle))
+        {
+            _menuPanel?.InitTutorial(_runtimeConfig.TutorialStageTitle);
+        }
         RenderReflectionProbes();
         UpdateUIs(0f);
     }

@@ -25285,7 +25285,7 @@ MonoBehaviour:
   _isAutoStandUp: 1
   _velocityThreshold: 0.5
   _standUpDelay: 2
-  _forcedStandUpTime: 10
+  _forcedStandUpTime: 6
   _timeToLerpBones: 0.3
   _boneSnapshots:
   - stateName: FaceDownStandUp

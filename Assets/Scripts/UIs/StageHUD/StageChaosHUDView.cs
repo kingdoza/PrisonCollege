@@ -12,6 +12,7 @@ public class StageChaosHUDView : MonoBehaviour
     [SerializeField, Min(1)] private int _arrowCount = 5;
     [Tooltip("초당 혼란 변화량 1당 화살표가 이동하는 칸 수/초")]
     [SerializeField, Min(0f)] private float _rateStepCoefficient = 1f;
+    [SerializeField] private Color _normalArrowColor = Color.white;
     [SerializeField] private Color _increaseHighlightColor = Color.red;
     [SerializeField] private Color _decreaseHighlightColor = Color.green;
 
@@ -22,6 +23,8 @@ public class StageChaosHUDView : MonoBehaviour
     private int _lastRenderedDirection;
     private int _lastRenderedIndex = -1;
     private int _lastRenderedArrowCount = -1;
+    private Color _lastRenderedNormalColor;
+    private Color _lastRenderedHighlightColor;
     private bool _initialized;
 
     public bool Initialize(StageController source)
@@ -111,27 +114,29 @@ public class StageChaosHUDView : MonoBehaviour
 
     private void RenderArrows(int count)
     {
+        bool increasing = _direction > 0;
+        Color highlight = increasing ? _increaseHighlightColor : _decreaseHighlightColor;
+
         if (_lastRenderedDirection == _direction
             && _lastRenderedIndex == _highlightIndex
-            && _lastRenderedArrowCount == count)
+            && _lastRenderedArrowCount == count
+            && _lastRenderedNormalColor == _normalArrowColor
+            && _lastRenderedHighlightColor == highlight)
         {
             return;
         }
 
-        bool increasing = _direction > 0;
         TMP_Text activeText = increasing ? _increaseArrowsText : _decreaseArrowsText;
         TMP_Text inactiveText = increasing ? _decreaseArrowsText : _increaseArrowsText;
         char arrow = increasing ? '▶' : '◀';
-        Color highlight = increasing ? _increaseHighlightColor : _decreaseHighlightColor;
+        string normalHex = ColorUtility.ToHtmlStringRGBA(_normalArrowColor);
         string highlightHex = ColorUtility.ToHtmlStringRGBA(highlight);
-        StringBuilder builder = new StringBuilder(count + 32);
+        StringBuilder builder = new StringBuilder(count * 32);
 
         for (int i = 0; i < count; i++)
         {
-            if (i == _highlightIndex)
-                builder.Append("<color=#").Append(highlightHex).Append('>').Append(arrow).Append("</color>");
-            else
-                builder.Append(arrow);
+            string colorHex = i == _highlightIndex ? highlightHex : normalHex;
+            builder.Append("<color=#").Append(colorHex).Append('>').Append(arrow).Append("</color>");
         }
 
         inactiveText.gameObject.SetActive(false);
@@ -140,6 +145,8 @@ public class StageChaosHUDView : MonoBehaviour
         _lastRenderedDirection = _direction;
         _lastRenderedIndex = _highlightIndex;
         _lastRenderedArrowCount = count;
+        _lastRenderedNormalColor = _normalArrowColor;
+        _lastRenderedHighlightColor = highlight;
     }
 
     private void InvalidateRender()

@@ -9,9 +9,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public sealed class UIButtonHoverVisualController : MonoBehaviour,
     IPointerEnterHandler,
-    IPointerExitHandler,
-    ISelectHandler,
-    IDeselectHandler
+    IPointerExitHandler
 {
     [Serializable]
     private sealed class GraphicColorGroup
@@ -62,7 +60,6 @@ public sealed class UIButtonHoverVisualController : MonoBehaviour,
 
     private Selectable _selectable;
     private bool _pointerInside;
-    private bool _selected;
     private bool _visualStateInitialized;
     private bool _isHoverVisualActive;
     private bool _wasInteractable;
@@ -84,7 +81,6 @@ public sealed class UIButtonHoverVisualController : MonoBehaviour,
         CaptureNewNormalColors();
 
         _pointerInside = false;
-        _selected = false;
         _configurationDirty = false;
         _wasInteractable = CanShowHover();
         SetHoverVisual(false, true, true);
@@ -118,7 +114,6 @@ public sealed class UIButtonHoverVisualController : MonoBehaviour,
         SetDecorationsActive(false);
 
         _pointerInside = false;
-        _selected = false;
         _visualStateInitialized = false;
         _isHoverVisualActive = false;
         _configurationDirty = false;
@@ -148,21 +143,9 @@ public sealed class UIButtonHoverVisualController : MonoBehaviour,
         RefreshVisualState();
     }
 
-    public void OnSelect(BaseEventData eventData)
-    {
-        _selected = true;
-        RefreshVisualState();
-    }
-
-    public void OnDeselect(BaseEventData eventData)
-    {
-        _selected = false;
-        RefreshVisualState();
-    }
-
     public void RefreshVisualState()
     {
-        bool shouldShowHover = CanShowHover() && (_pointerInside || _selected);
+        bool shouldShowHover = CanShowHover() && _pointerInside;
         SetHoverVisual(shouldShowHover, false, false);
     }
 
@@ -170,7 +153,7 @@ public sealed class UIButtonHoverVisualController : MonoBehaviour,
     {
         CaptureNewNormalColors();
 
-        bool shouldShowHover = CanShowHover() && (_pointerInside || _selected);
+        bool shouldShowHover = CanShowHover() && _pointerInside;
         SetHoverVisual(shouldShowHover, false, true);
     }
 
