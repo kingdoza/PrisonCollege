@@ -59378,10 +59378,10 @@ RectTransform:
   - {fileID: 6699222147078437633}
   m_Father: {fileID: 1634710825443451367}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 202.125, y: -30}
-  m_SizeDelta: {x: 124.75, y: 60}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &162561154871083403
 MonoBehaviour:
@@ -87705,10 +87705,10 @@ RectTransform:
   - {fileID: 9005463199060169367}
   m_Father: {fileID: 1634710825443451367}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 62.375, y: -30}
-  m_SizeDelta: {x: 124.75, y: 60}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2293570531004338440
 MonoBehaviour:
@@ -91252,6 +91252,9 @@ MonoBehaviour:
   _reflectionGroup: {fileID: 0}
   _sunLightObject: {fileID: 0}
   _moonLightObject: {fileID: 0}
+  _directionalLight: {fileID: 0}
+  _normalDirectionalLightIntensity: 0.5
+  _blackoutDirectionalLightIntensity: 0
   _moneyGainSD: {fileID: 11400000, guid: 8cacb609a99f9b44e93e201b311c0898, type: 2}
   StageStartEvent:
     m_PersistentCalls:
