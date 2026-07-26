@@ -107,6 +107,9 @@ public class StageController : SceneSingleton<StageController>
     public StageSpots StageSpots => _stageSpots;
     public StageRuntimeConfig RuntimeConfig => _runtimeConfig;
     public bool IsTutorialRuntime => _runtimeConfig != null && _runtimeConfig.IsTutorial;
+    public string StageDisplayTitle => IsTutorialRuntime
+        ? _runtimeConfig.TutorialStageTitle
+        : $"웨이브 {WaveSystem.Instance.CurrentWave}";
     public IReadOnlyList<PostStudent> Students => _studentList;
 
     public event Action<ChaosChangedData> ChaosChanged;
@@ -214,7 +217,7 @@ public class StageController : SceneSingleton<StageController>
         {
             _menuPanel?.Init();
         }
-        _waveTmp.text = $"웨이브 {WaveSystem.Instance.CurrentWave}";
+        _waveTmp.text = StageDisplayTitle;
         InventorySystem.Instance.FillEquipSlots(_equipSlotList);
 
         _studentList = _studentSpawner.SpawnStudents(WaveSystem.Instance.BehaviorWeightSet);
@@ -272,7 +275,7 @@ public class StageController : SceneSingleton<StageController>
         if (_topPanelGroup != null) _topPanelGroup.alpha = 1f;
         if (_waveTmp != null)
         {
-            _waveTmp.text = _runtimeConfig.TutorialStageTitle;
+            _waveTmp.text = StageDisplayTitle;
             _waveTmp.gameObject.SetActive(true);
         }
         if (_escapeTmp != null) _escapeTmp.gameObject.SetActive(true);

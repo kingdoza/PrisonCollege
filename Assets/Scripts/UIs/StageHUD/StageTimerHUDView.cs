@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class StageTimerHUDView : MonoBehaviour
 {
+    [SerializeField] private TMP_Text _stageTitleText;
     [SerializeField] private TMP_Text _remainingTimeText;
     [SerializeField] private Image _remainingTimeFill;
     [Tooltip("정규 스테이지에서 정확한 전체 제한 시간을 읽을 Timer Stat입니다. 비워 두면 최초 관측 시간을 전체 시간으로 사용합니다.")]
@@ -21,13 +22,19 @@ public class StageTimerHUDView : MonoBehaviour
     public bool Initialize(StageController source)
     {
         Shutdown();
-        if (source == null || _remainingTimeText == null || _remainingTimeFill == null)
+        if (source == null
+            || _stageTitleText == null
+            || _remainingTimeText == null
+            || _remainingTimeFill == null)
         {
-            Debug.LogError("StageTimerHUDView의 StageController, 시간 TMP 또는 Fill Image 참조가 누락됐습니다.", this);
+            Debug.LogError(
+                "StageTimerHUDView의 StageController, 스테이지 제목 TMP, 시간 TMP 또는 Fill Image 참조가 누락됐습니다.",
+                this);
             return false;
         }
 
         _source = source;
+        _stageTitleText.text = source.StageDisplayTitle;
         _originalTextColor = _remainingTimeText.color;
         _originalFillColor = _remainingTimeFill.color;
         _tutorialTimerStarted = !source.IsTutorialRuntime;

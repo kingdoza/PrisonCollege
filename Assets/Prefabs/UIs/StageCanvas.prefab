@@ -82470,6 +82470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ab4b9d702907004daf8de5a54b1d2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageTimerHUDView
+  _stageTitleText: {fileID: 4976633045871138590}
   _remainingTimeText: {fileID: 6835196408605090}
   _remainingTimeFill: {fileID: 9163143939701991068}
   _normalTimerStat: {fileID: 6673780815732938716}
