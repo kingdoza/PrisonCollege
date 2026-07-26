@@ -3498,28 +3498,26 @@ MonoBehaviour:
   waveEntries:
   - behaviorWeightSet: {fileID: 11400000, guid: 9837560df67a56a46ae7906ffafb20a1, type: 2}
     dayState: 0
-    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9: \uD0C8\uCD9C
-      \uC2DC\uB3C4\n\uD0C8\uCD9C, \uB3CC\uC9C4, \uD0DC\uD074"
+    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9:\n\uD0C8\uCD9C,
+      \uB3CC\uC9C4, \uD0DC\uD074"
     enforceProb: 0
     isEndWithArena: 0
   - behaviorWeightSet: {fileID: 11400000, guid: f6d34312ffb02c7428b79212315cb02b, type: 2}
     dayState: 0
     explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9: \uD63C\uB780
-      \uC720\uBC1C\n\uC2F8\uC6B0\uAE30, \uC800\uC9C8\uB178\uB798"
+      \uC720\uBC1C\n\uD63C\uB780 \uC720\uBC1C(\uC2F8\uC6B0\uAE30, \uC800\uC9C8\uB178\uB798)"
     enforceProb: 0
     isEndWithArena: 1
   - behaviorWeightSet: {fileID: 11400000, guid: 934718cbb17fb854f8f9c98887cdf7cc, type: 2}
     dayState: 0
-    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9: \uAD50\uC218
-      \uBC29\uD574\n\uD574\uD0B9, \uD654\uC7AC(\uC804\uC790\uB80C\uC9C0 \uD3ED\uBC1C,
-      \uD761\uC5F0)\n\uB300\uD559\uC6D0\uC0DD \uBC29\uD638 \uD655\uB960 20%"
+    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9:\n\uD574\uD0B9,
+      \uD654\uC7AC(\uC804\uC790\uB80C\uC9C0 \uD3ED\uBC1C, \uD761\uC5F0)\n\uB300\uD559\uC6D0\uC0DD
+      \uBC29\uD638 \uD655\uB960 20%"
     enforceProb: 0.2
     isEndWithArena: 0
   - behaviorWeightSet: {fileID: 11400000, guid: 7d3c1036d191d334bb755491ce462151, type: 2}
     dayState: 0
-    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9: \uD30C\uC5C5\n\uADF8\uB4E4\uC740
-      \uC2A4\uC2A4\uB85C \uC77C\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.\n\uB300\uD559\uC6D0\uC0DD
-      \uBC29\uD638 \uD655\uB960 80%"
+    explanation: "\uB300\uD559\uC6D0\uC0DD \uBC29\uD638 \uD655\uB960 80%"
     enforceProb: 0.8
     isEndWithArena: 0
   _nightChaosFactor: 1.5

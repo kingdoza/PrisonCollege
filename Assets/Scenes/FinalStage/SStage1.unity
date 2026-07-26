@@ -8791,10 +8791,10 @@ RectTransform:
   - {fileID: 1830866672}
   m_Father: {fileID: 560551353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 202.125, y: -30}
+  m_SizeDelta: {x: 124.75, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &116962767
 MonoBehaviour:
@@ -38321,7 +38321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2832918e06c9a04488e97af97613ad69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stat
-  _maxStat: 80
+  _maxStat: 5
   _currentStat: 0
   IncreaseEvent:
     m_PersistentCalls:
@@ -86950,8 +86950,8 @@ MonoBehaviour:
   _resultColorTarget: {fileID: 1636052107}
   _successColor: {r: 0, g: 1, b: 0, a: 0.3137255}
   _failureColor: {r: 1, g: 0, b: 0, a: 0.3137255}
-  _stageEndAnimator: {fileID: 0}
-  _waveEndAnimator: {fileID: 0}
+  _stageEndAnimator: {fileID: 1849726098}
+  _waveEndAnimator: {fileID: 1799754394}
 --- !u!225 &1389776056
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -104586,10 +104586,10 @@ RectTransform:
   - {fileID: 163590807}
   m_Father: {fileID: 560551353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 62.375, y: -30}
+  m_SizeDelta: {x: 124.75, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1660736249
 MonoBehaviour:
@@ -113072,7 +113072,7 @@ MonoBehaviour:
   _panelRect: {fileID: 1237247666}
   _contentCanvasGroup: {fileID: 1201736789}
   _minimumHeight: 56
-  _unfoldDuration: 0.28
+  _unfoldDuration: 0.3
 --- !u!1001 &1807534961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117111,7 +117111,7 @@ MonoBehaviour:
   _panelRect: {fileID: 1636052106}
   _contentCanvasGroup: {fileID: 1032092707}
   _minimumHeight: 56
-  _unfoldDuration: 0.28
+  _unfoldDuration: 0.4
 --- !u!1 &1850871401
 GameObject:
   m_ObjectHideFlags: 0

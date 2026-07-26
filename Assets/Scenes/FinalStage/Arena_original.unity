@@ -1130,6 +1130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   _emitterPrefab: {fileID: 1991647734150120844, guid: 7f7b9a924b5795b48bc0cc939a43b86b, type: 3}
   _longDistancemitterPrefab: {fileID: 0}
+  _bgmEitterPrefab: {fileID: 0}
   _poolSize: 20
 --- !u!4 &333504989
 Transform:
@@ -1670,6 +1671,7 @@ MonoBehaviour:
   _throwVelocity: 15
   _flipVelocity: 300
   _torqueRandomness: 0.2
+  _enableCorrection: 1
 --- !u!114 &453567979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1717,6 +1719,7 @@ MonoBehaviour:
   _walkBobSpeed: 10
   _swayAmount: 0.01
   _smoothAmount: 6
+  _swayReferenceFrameRate: 60
   _throwableModel: {fileID: 308668704680388244}
   _throwSD: {fileID: 11400000, guid: 4e24fb5bc2487514bb6b2f0baeddd20d, type: 2}
 --- !u!1 &459626692
@@ -6348,12 +6351,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Tab\uC73C\uB85C \uB9C9\uACE0\uB77C \uC2DC\uC791\uD558\uAE30\n<size=80%>\uB0A8\uAD81\uD6C8
+  m_text: "[Tab]\uC73C\uB85C \uB9C9\uACE0\uB77C \uC2DC\uC791\uD558\uAE30\n<size=80%>\uB0A8\uAD81\uD6C8
     \uC2B9\uB9AC \uC2DC : 400 \uD68D\uB4DD\n\uB0A8\uAD81\uD6C8 \uD328\uBC30 \uC2DC
     : 200 \uC190\uC2E4</size>"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 29743bbba89f1bc4089114277ae6944b, type: 2}
-  m_sharedMaterial: {fileID: 3512200576059445375, guid: 29743bbba89f1bc4089114277ae6944b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 106a5b830abaaee4e9ca2aed9723f8b7, type: 2}
+  m_sharedMaterial: {fileID: 3512200576059445375, guid: 106a5b830abaaee4e9ca2aed9723f8b7, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

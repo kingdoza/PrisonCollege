@@ -21,6 +21,7 @@ public class BettingHelper : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _continueTmp;
     [SerializeField] private TextMeshProUGUI _totalMoneyTmp;
     [SerializeField] private TextMeshProUGUI _betMoneyTmp;
+    [SerializeField] private Button _startFightButton;
     private Color _originalLeftColor;
     private Color _originalRightColor;
     private SelectedSide _selectedSide = SelectedSide.None;
@@ -31,6 +32,8 @@ public class BettingHelper : MonoBehaviour
 
     private int _totalMoney;
     private int _betMoney;
+
+    private bool CanStartFight => !_isStarted && _selectedSide != SelectedSide.None;
 
 
 
@@ -63,11 +66,9 @@ public class BettingHelper : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab) && _selectedSide != SelectedSide.None)
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            _isStarted = true;
-            FightStartEvent?.Invoke(_selectedSide, _betMoney);
-            gameObject.SetActive(false);
+            TryStartFight();
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -77,6 +78,18 @@ public class BettingHelper : MonoBehaviour
         {
             DecreaseBet();
         }
+    }
+
+
+
+    public void TryStartFight()
+    {
+        if (!CanStartFight) return;
+
+        _isStarted = true;
+        UpdateStartFightButton();
+        FightStartEvent?.Invoke(_selectedSide, _betMoney);
+        gameObject.SetActive(false);
     }
 
 
@@ -154,6 +167,14 @@ public class BettingHelper : MonoBehaviour
             UnhighlightRightButton();
         }
         UpdateContinueTextUI();
+        UpdateStartFightButton();
+    }
+
+
+    private void UpdateStartFightButton()
+    {
+        if (_startFightButton == null) return;
+        _startFightButton.interactable = CanStartFight;
     }
 
 
@@ -165,7 +186,7 @@ public class BettingHelper : MonoBehaviour
             return;
         }
         string targetName = _selectedSide == SelectedSide.Left ? _leftBtnTmp.text : _rightBtnTmp.text;
-        _continueTmp.text = $"Tab으로 막고라 시작하기\r\n<size=80%>{targetName} 승리 시 : +{(_betMoney * 2).ToString("N0")}";//\r\n{targetName} 패배 시 : -{_betMoney.ToString("N0")}</size>";
+        _continueTmp.text = $"막고라 시작\r\n<size=70%>{targetName} 승리 시: +{(_betMoney * 2).ToString("N0")}";//\r\n{targetName} 패배 시 : -{_betMoney.ToString("N0")}</size>";
     }
 
 
