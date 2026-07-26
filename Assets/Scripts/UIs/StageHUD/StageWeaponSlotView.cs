@@ -29,6 +29,9 @@ public class StageWeaponSlotView : MonoBehaviour
     [SerializeField, Min(0f)] private float _selectedHeightIncrease = 24f;
     [SerializeField, Min(0f)] private float _selectionAnimationDuration = 0.15f;
 
+    [Header("Shake Feedback")]
+    [SerializeField] private UIRectShakeFeedback _depletionShake = new();
+
     private Color _originalFillColor;
     private Color _originalStateColor;
     private float _originalFillAmount;
@@ -43,6 +46,8 @@ public class StageWeaponSlotView : MonoBehaviour
     private bool _isSelected;
     private bool _hasWeaponContent;
     private bool _hasSelectionState;
+    private WeaponBase _boundWeapon;
+    private Stat _boundAmmunition;
 
     public bool ValidateReferences()
     {
@@ -52,7 +57,9 @@ public class StageWeaponSlotView : MonoBehaviour
             && _ammunitionStateImage != null
             && _weaponNameText != null
             && _ammunitionText != null
-            && _selectionHeightTarget != null;
+            && _selectionHeightTarget != null
+            && _depletionShake != null
+            && _depletionShake.IsValid;
     }
 
     public void Refresh(WeaponBase weapon, bool selected, bool immediate)
@@ -64,11 +71,14 @@ public class StageWeaponSlotView : MonoBehaviour
             _originalFillAmount = _ammunitionFill.fillAmount;
             _normalBottomOffset = _selectionHeightTarget.offsetMin.y;
             _normalTopOffset = _selectionHeightTarget.offsetMax.y;
+            _depletionShake.Initialize();
         }
 
         bool empty = weapon == null || weapon is EmptyWeapon || _itemSlot.Item == null;
         _hasWeaponContent = !empty;
-        RefreshContent(weapon, empty);
+        Stat ammunition = empty ? null : weapon.GetComponent<Stat>();
+        BindAmmunition(weapon, ammunition);
+        RefreshContent(weapon, ammunition, empty);
 
         if (!_hasSelectionState || selected != _isSelected || immediate)
             SetSelected(selected, immediate || !_hasSelectionState);
@@ -78,6 +88,8 @@ public class StageWeaponSlotView : MonoBehaviour
 
     public void Shutdown()
     {
+        BindAmmunition(null, null);
+        _depletionShake?.Shutdown();
         if (!_hasSelectionState) return;
 
         _offsetAnimating = false;
@@ -97,7 +109,7 @@ public class StageWeaponSlotView : MonoBehaviour
             UpdateOffsetAnimation();
     }
 
-    private void RefreshContent(WeaponBase weapon, bool empty)
+    private void RefreshContent(WeaponBase weapon, Stat ammunition, bool empty)
     {
         if (empty)
         {
@@ -117,7 +129,6 @@ public class StageWeaponSlotView : MonoBehaviour
         _weaponIcon.enabled = _weaponIcon.sprite != null;
         _weaponNameText.text = weapon.Name;
 
-        Stat ammunition = weapon.GetComponent<Stat>();
         if (ammunition == null)
         {
             _ammunitionFill.fillAmount = 1f;
@@ -143,6 +154,34 @@ public class StageWeaponSlotView : MonoBehaviour
 
         _weaponNameText.gameObject.SetActive(_isSelected);
         _ammunitionText.gameObject.SetActive(_isSelected);
+    }
+
+    private void BindAmmunition(WeaponBase weapon, Stat ammunition)
+    {
+        if (_boundWeapon == weapon && _boundAmmunition == ammunition)
+            return;
+
+        if (_boundAmmunition != null)
+            _boundAmmunition.DepletedEvent.RemoveListener(OnAmmunitionDepleted);
+
+        _boundWeapon = weapon;
+        _boundAmmunition = ammunition;
+        if (_boundAmmunition != null)
+            _boundAmmunition.DepletedEvent.AddListener(OnAmmunitionDepleted);
+    }
+
+    private void OnAmmunitionDepleted()
+    {
+        if (!_hasSelectionState
+            || !_isSelected
+            || !_hasWeaponContent
+            || _boundWeapon == null
+            || _boundAmmunition == null)
+        {
+            return;
+        }
+
+        _depletionShake.Play();
     }
 
     private void SetSelected(bool selected, bool immediate)

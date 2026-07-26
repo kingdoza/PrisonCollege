@@ -31,6 +31,7 @@ public class Professor : MonoBehaviour, IAttackable
 
     public UnityEvent<string> DieEvent = new();
     public UnityEvent StaminaRunoutEvent = new();
+    public event UnityAction StaminaDepleted;
     public float JumpStamina => _jumpStamina;
     public WeaponController WeaponController => _weaponController;
     public float CurrentHealth => _health != null ? _health.Current : 0f;
@@ -53,6 +54,7 @@ public class Professor : MonoBehaviour, IAttackable
         _playerInteraction = GetComponent<PlayerInteraction>();
         _stamina = GetComponent<Stamina>();
         _stamina.Initialize();
+        _stamina.DepletedEvent.AddListener(OnStaminaDepleted);
         _collider = GetComponent<Collider>();
         _statRecovery = GetComponent<StatRecovery>();
         _staminaCostMod = AttributeSystem.Instance.StaminaCostMod;
@@ -291,6 +293,13 @@ public class Professor : MonoBehaviour, IAttackable
 
 
 
+    private void OnStaminaDepleted()
+    {
+        StaminaDepleted?.Invoke();
+    }
+
+
+
     private void HandleWeaponSwap()
     {
         if (_weaponController.IsHiding) return;
@@ -325,5 +334,13 @@ public class Professor : MonoBehaviour, IAttackable
     public void Attack()
     {
         
+    }
+
+
+
+    private void OnDestroy()
+    {
+        if (_stamina != null)
+            _stamina.DepletedEvent.RemoveListener(OnStaminaDepleted);
     }
 }

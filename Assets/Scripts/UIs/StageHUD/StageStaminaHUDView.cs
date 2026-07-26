@@ -12,11 +12,17 @@ public class StageStaminaHUDView : MonoBehaviour
     [SerializeField, Min(0f)] private float _depletionFlashDuration = 0.25f;
     [SerializeField] private Color _depletionColor = Color.red;
 
+    [Header("Shake Feedback")]
+    [SerializeField] private UIRectShakeFeedback _depletionShake = new();
+    [Tooltip("실제 고갈과 공격 거부가 함께 발생할 때 중복 Shake를 막는 최소 간격")]
+    [SerializeField, Min(0f)] private float _shakeCooldown = 0.25f;
+
     private Professor _source;
     private Color[] _originalGraphicColors;
     private float _originalCanvasAlpha;
     private float _fullHoldRemaining;
     private float _flashRemaining;
+    private float _nextShakeTime;
     private bool _wasFull;
     private bool _wasDepleted;
     private bool _flashApplied;
@@ -25,13 +31,18 @@ public class StageStaminaHUDView : MonoBehaviour
     public bool Initialize(Professor source)
     {
         Shutdown();
-        if (source == null || _canvasGroup == null || _staminaFill == null)
+        if (source == null
+            || _canvasGroup == null
+            || _staminaFill == null
+            || _depletionShake == null
+            || !_depletionShake.IsValid)
         {
-            Debug.LogError("StageStaminaHUDView의 Professor, CanvasGroup 또는 Fill Image 참조가 누락됐습니다.", this);
+            Debug.LogError("StageStaminaHUDView의 Professor, CanvasGroup, Fill Image 또는 Shake Visual 참조가 누락됐습니다.", this);
             return false;
         }
 
         _source = source;
+        _depletionShake.Initialize();
         _originalCanvasAlpha = _canvasGroup.alpha;
         _originalGraphicColors = new Color[_depletionFlashGraphics == null ? 0 : _depletionFlashGraphics.Length];
         for (int i = 0; i < _originalGraphicColors.Length; i++)
@@ -46,12 +57,22 @@ public class StageStaminaHUDView : MonoBehaviour
         _fullHoldRemaining = _wasFull ? _fullHoldDuration : 0f;
         _canvasGroup.alpha = 1f;
         _staminaFill.fillAmount = ratio;
+        _nextShakeTime = float.NegativeInfinity;
+        _source.StaminaRunoutEvent.AddListener(OnStaminaFeedbackRequested);
+        _source.StaminaDepleted += OnStaminaFeedbackRequested;
         _initialized = true;
         return true;
     }
 
     public void Shutdown()
     {
+        if (_source != null)
+        {
+            _source.StaminaRunoutEvent.RemoveListener(OnStaminaFeedbackRequested);
+            _source.StaminaDepleted -= OnStaminaFeedbackRequested;
+        }
+        _depletionShake?.Shutdown();
+
         if (_flashApplied)
             RestoreGraphicColors();
         if (_canvasGroup != null && _initialized)
@@ -60,6 +81,7 @@ public class StageStaminaHUDView : MonoBehaviour
         _source = null;
         _originalGraphicColors = null;
         _flashRemaining = 0f;
+        _nextShakeTime = float.NegativeInfinity;
         _flashApplied = false;
         _initialized = false;
     }
@@ -119,6 +141,17 @@ public class StageStaminaHUDView : MonoBehaviour
 
         _wasFull = isFull;
         _wasDepleted = isDepleted;
+    }
+
+    private void OnStaminaFeedbackRequested()
+    {
+        if (!_initialized) return;
+
+        float now = Time.unscaledTime;
+        if (now < _nextShakeTime) return;
+
+        _depletionShake.Play();
+        _nextShakeTime = now + _shakeCooldown;
     }
 
     private void ApplyDepletionColor()

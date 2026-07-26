@@ -61,6 +61,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StageEscapeSlotView
   _remainingVisual: {fileID: 1425518616410692364}
   _failedVisual: {fileID: 4282445310644480801}
+  _failureShake:
+    _target: {fileID: 6355180576706916362}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
 --- !u!1 &1425518616410692364
 GameObject:
   m_ObjectHideFlags: 0

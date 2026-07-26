@@ -51,7 +51,8 @@ public class StageOver : MonoBehaviour
     public void ShowStageOverPanel(bool isSuccess)
     {
         ApplyResultColor(isSuccess);
-        _stageTitleTmp.text = isSuccess ? "<color=green>감금 성공!</color>" : "<color=red>감금 실패!</color>";
+        _stageTitleTmp.text = isSuccess ? "감금 성공!" : "감금 실패!";
+        _stageTitleTmp.color = isSuccess ? Color.green : Color.red;
         _detailTmp.text = isSuccess ? "대학원생들의 자유 박탈에 성공하였습니다." : "대학원생들에게 자유를 허락하고 말았습니다.";
         ShowResultCanvas(_stageEndCanvas, _stageEndAnimator);
     }

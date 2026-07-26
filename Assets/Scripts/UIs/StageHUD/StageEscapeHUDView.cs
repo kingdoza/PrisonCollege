@@ -22,18 +22,27 @@ public class StageEscapeHUDView : MonoBehaviour
         }
         if (!_slotPrefab.IsValid)
         {
-            Debug.LogError("StageEscapeSlotView 프리팹에는 잔여/실패 아이콘 인스턴스가 모두 필요합니다.", _slotPrefab);
+            Debug.LogError("StageEscapeSlotView 프리팹에는 잔여/실패 아이콘과 Shake Visual 참조가 모두 필요합니다.", _slotPrefab);
             return false;
         }
 
         _source = source;
         _initialized = true;
-        Refresh(true);
+        Refresh(true, false);
+        _source.StudentEscaped += OnStudentEscaped;
         return true;
     }
 
     public void Shutdown()
     {
+        if (_source != null)
+            _source.StudentEscaped -= OnStudentEscaped;
+        foreach (StageEscapeSlotView slot in _slots)
+        {
+            if (slot != null)
+                slot.Shutdown();
+        }
+
         _source = null;
         _initialized = false;
         _lastThreshold = -1;
@@ -43,10 +52,16 @@ public class StageEscapeHUDView : MonoBehaviour
     private void Update()
     {
         if (_initialized)
-            Refresh(false);
+            Refresh(false, false);
     }
 
-    private void Refresh(bool force)
+    private void OnStudentEscaped(PostStudent student)
+    {
+        if (_initialized)
+            Refresh(false, true);
+    }
+
+    private void Refresh(bool force, bool animateNewestFailure)
     {
         int threshold = Mathf.Max(0, _source.EscapeFailureThreshold);
         int escapeCount = Mathf.Clamp(_source.EscapeCount, 0, threshold);
@@ -56,13 +71,17 @@ public class StageEscapeHUDView : MonoBehaviour
             EnsureSlotCount(threshold);
             _lastThreshold = threshold;
             force = true;
+            animateNewestFailure = false;
         }
 
         if (!force && escapeCount == _lastEscapeCount) return;
 
         int failedStartIndex = _slots.Count - escapeCount;
+        int newestFailedIndex = animateNewestFailure && escapeCount > 0
+            ? failedStartIndex
+            : -1;
         for (int i = 0; i < _slots.Count; i++)
-            _slots[i].SetFailed(i >= failedStartIndex);
+            _slots[i].SetFailed(i >= failedStartIndex, i == newestFailedIndex);
 
         _lastEscapeCount = escapeCount;
     }
@@ -75,14 +94,18 @@ public class StageEscapeHUDView : MonoBehaviour
             StageEscapeSlotView slot = _slots[lastIndex];
             _slots.RemoveAt(lastIndex);
             if (slot != null)
+            {
+                slot.Shutdown();
                 Destroy(slot.gameObject);
+            }
         }
 
         while (_slots.Count < count)
         {
             StageEscapeSlotView slot = Instantiate(_slotPrefab, _slotContainer);
             slot.gameObject.SetActive(true);
-            slot.SetFailed(false);
+            slot.Initialize();
+            slot.SetFailed(false, false);
             _slots.Add(slot);
         }
     }

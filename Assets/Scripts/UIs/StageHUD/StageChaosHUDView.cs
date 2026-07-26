@@ -16,15 +16,22 @@ public class StageChaosHUDView : MonoBehaviour
     [SerializeField] private Color _increaseHighlightColor = Color.red;
     [SerializeField] private Color _decreaseHighlightColor = Color.green;
 
+    [Header("Shake Feedback")]
+    [SerializeField] private UIRectShakeFeedback _increaseShake = new();
+    [Tooltip("지속 혼란 증가 중 Shake를 다시 실행할 수 있는 최소 간격")]
+    [SerializeField, Min(0f)] private float _continuousShakeCooldown = 0.8f;
+
     private StageController _source;
     private int _direction;
     private int _highlightIndex;
     private float _stepAccumulator;
+    private float _nextContinuousShakeTime;
     private int _lastRenderedDirection;
     private int _lastRenderedIndex = -1;
     private int _lastRenderedArrowCount = -1;
     private Color _lastRenderedNormalColor;
     private Color _lastRenderedHighlightColor;
+    private bool _continuousIncreaseActive;
     private bool _initialized;
 
     public bool Initialize(StageController source)
@@ -34,22 +41,30 @@ public class StageChaosHUDView : MonoBehaviour
             || _chaosStat == null
             || _chaosProgressFill == null
             || _increaseArrowsText == null
-            || _decreaseArrowsText == null)
+            || _decreaseArrowsText == null
+            || _increaseShake == null
+            || !_increaseShake.IsValid)
         {
-            Debug.LogError("StageChaosHUDView의 StageController, Chaos Stat, Fill 또는 화살표 TMP 참조가 누락됐습니다.", this);
+            Debug.LogError("StageChaosHUDView의 StageController, Chaos Stat, Fill, 화살표 TMP 또는 Shake Visual 참조가 누락됐습니다.", this);
             return false;
         }
 
         _source = source;
         _increaseArrowsText.richText = true;
         _decreaseArrowsText.richText = true;
+        _increaseShake.Initialize();
         _initialized = true;
         Refresh();
+        _source.ChaosChanged += OnChaosChanged;
         return true;
     }
 
     public void Shutdown()
     {
+        if (_source != null)
+            _source.ChaosChanged -= OnChaosChanged;
+        _increaseShake?.Shutdown();
+
         if (_increaseArrowsText != null)
             _increaseArrowsText.gameObject.SetActive(false);
         if (_decreaseArrowsText != null)
@@ -58,6 +73,8 @@ public class StageChaosHUDView : MonoBehaviour
         _source = null;
         _direction = 0;
         _stepAccumulator = 0f;
+        _nextContinuousShakeTime = 0f;
+        _continuousIncreaseActive = false;
         _initialized = false;
         InvalidateRender();
     }
@@ -77,6 +94,12 @@ public class StageChaosHUDView : MonoBehaviour
         float rate = _source.ChaosRate;
         int nextDirection = Mathf.Approximately(rate, 0f) ? 0 : (rate > 0f ? 1 : -1);
         int count = Mathf.Max(1, _arrowCount);
+
+        if (_continuousIncreaseActive && nextDirection <= 0)
+        {
+            _continuousIncreaseActive = false;
+            _nextContinuousShakeTime = 0f;
+        }
 
         if (nextDirection == 0)
         {
@@ -110,6 +133,26 @@ public class StageChaosHUDView : MonoBehaviour
         }
 
         RenderArrows(count);
+    }
+
+    private void OnChaosChanged(ChaosChangedData data)
+    {
+        if (!_initialized || data.delta <= 0f || data.reason == ChaosChangeReason.Reset)
+            return;
+
+        if (data.reason != ChaosChangeReason.ContinuousHazard)
+        {
+            _increaseShake.Play();
+            return;
+        }
+
+        float now = Time.unscaledTime;
+        if (!_continuousIncreaseActive || now >= _nextContinuousShakeTime)
+        {
+            _increaseShake.Play();
+            _nextContinuousShakeTime = now + _continuousShakeCooldown;
+        }
+        _continuousIncreaseActive = true;
     }
 
     private void RenderArrows(int count)

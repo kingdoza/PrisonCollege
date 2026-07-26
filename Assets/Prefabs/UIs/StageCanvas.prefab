@@ -9061,6 +9061,14 @@ MonoBehaviour:
   _fullFadeDuration: 0.25
   _depletionFlashDuration: 0.25
   _depletionColor: {r: 1, g: 0, b: 0, a: 1}
+  _depletionShake:
+    _target: {fileID: 279930643356666650}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
+  _shakeCooldown: 0.25
 --- !u!1 &877299422646188202
 GameObject:
   m_ObjectHideFlags: 0
@@ -26721,6 +26729,13 @@ MonoBehaviour:
   _selectionHeightTarget: {fileID: 6972978557702687037}
   _selectedHeightIncrease: 150
   _selectionAnimationDuration: 0.15
+  _depletionShake:
+    _target: {fileID: 6972978557702687037}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
 --- !u!1 &2287859552389798073
 GameObject:
   m_ObjectHideFlags: 0
@@ -27204,6 +27219,13 @@ MonoBehaviour:
   _selectionHeightTarget: {fileID: 6584582133373418671}
   _selectedHeightIncrease: 150
   _selectionAnimationDuration: 0.15
+  _depletionShake:
+    _target: {fileID: 6584582133373418671}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
 --- !u!1 &2351962230539579598
 GameObject:
   m_ObjectHideFlags: 0
@@ -43633,7 +43655,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3038675603899103651
 RectTransform:
   m_ObjectHideFlags: 0
@@ -55798,6 +55820,13 @@ MonoBehaviour:
   _selectionHeightTarget: {fileID: 6257451697646039320}
   _selectedHeightIncrease: 150
   _selectionAnimationDuration: 0.15
+  _depletionShake:
+    _target: {fileID: 6257451697646039320}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
 --- !u!1 &5229790080302489233
 GameObject:
   m_ObjectHideFlags: 0
@@ -59378,10 +59407,10 @@ RectTransform:
   - {fileID: 6699222147078437633}
   m_Father: {fileID: 1634710825443451367}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 202.125, y: -30}
+  m_SizeDelta: {x: 124.75, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &162561154871083403
 MonoBehaviour:
@@ -71950,6 +71979,14 @@ MonoBehaviour:
   _normalArrowColor: {r: 1, g: 1, b: 1, a: 0.5019608}
   _increaseHighlightColor: {r: 1, g: 0, b: 0, a: 1}
   _decreaseHighlightColor: {r: 0, g: 1, b: 0, a: 1}
+  _increaseShake:
+    _target: {fileID: 656179038605129731}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
+  _continuousShakeCooldown: 0.8
 --- !u!1 &6915357076364115634
 GameObject:
   m_ObjectHideFlags: 0
@@ -72584,6 +72621,13 @@ MonoBehaviour:
   _selectionHeightTarget: {fileID: 6391935117551714363}
   _selectedHeightIncrease: 150
   _selectionAnimationDuration: 0.15
+  _depletionShake:
+    _target: {fileID: 6391935117551714363}
+    _duration: 0.25
+    _strength: 20
+    _vibrato: 24
+    _randomness: 90
+    _fadeOut: 1
 --- !u!1 &7009529115644660756
 GameObject:
   m_ObjectHideFlags: 0
@@ -87706,10 +87750,10 @@ RectTransform:
   - {fileID: 9005463199060169367}
   m_Father: {fileID: 1634710825443451367}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 62.375, y: -30}
+  m_SizeDelta: {x: 124.75, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2293570531004338440
 MonoBehaviour:
