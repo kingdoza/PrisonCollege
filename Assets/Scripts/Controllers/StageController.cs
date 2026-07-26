@@ -69,6 +69,10 @@ public class StageController : SceneSingleton<StageController>
     [Header("Directional Lights")]
     [SerializeField] private GameObject _sunLightObject;
     [SerializeField] private GameObject _moonLightObject;
+    [Header("Blackout Directional Light")]
+    [SerializeField] private Light _directionalLight;
+    [SerializeField, Min(0f)] private float _normalDirectionalLightIntensity = 1f;
+    [SerializeField, Min(0f)] private float _blackoutDirectionalLightIntensity = 0.2f;
     [Header("Sound Datas")]
     [SerializeField] private SoundData _moneyGainSD;
 
@@ -77,6 +81,7 @@ public class StageController : SceneSingleton<StageController>
     private int _workingStudCount = 0;
     private bool _isProfWorking = false;
     private List<PostStudent> _studentList = new();
+    private LabLightSystem _labLightSystem;
     private TutorialStagePolicy _tutorialPolicy;
     private float _currentChaosRate;
     private int _tutorialEscapeFailureThreshold = 3;
@@ -180,6 +185,8 @@ public class StageController : SceneSingleton<StageController>
 
     private void Start()
     {
+        InitializeDirectionalLight();
+
         int studentLayer = LayerMask.NameToLayer(Global.STUDENT_LAYER_NAME);
         Physics.IgnoreLayerCollision(studentLayer, studentLayer, true);
         if (IsTutorialRuntime)
@@ -534,6 +541,52 @@ public class StageController : SceneSingleton<StageController>
         _money += _progectReward;
         _chaosUi.SpawnWarningPanel(new ProjectMoneyInfo(_progectReward));
         //SoundUtils.PlayUISFX(_moneyGainSD);
+    }
+
+
+
+    private void InitializeDirectionalLight()
+    {
+        if (_directionalLight == null) return;
+
+        _labLightSystem = UnityEngine.Object.FindFirstObjectByType<LabLightSystem>();
+        if (_labLightSystem == null)
+        {
+            SetDirectionalLightIntensity(_normalDirectionalLightIntensity);
+            Debug.LogWarning(
+                "Directional Light가 할당됐지만 LabLightSystem을 찾지 못해 정전 밝기 전환을 사용할 수 없습니다.",
+                this);
+            return;
+        }
+
+        _labLightSystem.LightsOffEvent.AddListener(OnLabLightsTurnedOff);
+        _labLightSystem.LightsOnEvent.AddListener(OnLabLightsTurnedOn);
+        SetDirectionalLightIntensity(
+            _labLightSystem.IsLightsOn
+                ? _normalDirectionalLightIntensity
+                : _blackoutDirectionalLightIntensity);
+    }
+
+
+
+    private void OnLabLightsTurnedOff()
+    {
+        SetDirectionalLightIntensity(_blackoutDirectionalLightIntensity);
+    }
+
+
+
+    private void OnLabLightsTurnedOn()
+    {
+        SetDirectionalLightIntensity(_normalDirectionalLightIntensity);
+    }
+
+
+
+    private void SetDirectionalLightIntensity(float intensity)
+    {
+        if (_directionalLight != null)
+            _directionalLight.intensity = intensity;
     }
 
 
@@ -914,6 +967,12 @@ public class StageController : SceneSingleton<StageController>
 
     protected override void OnDestroy()
     {
+        if (_labLightSystem != null)
+        {
+            _labLightSystem.LightsOffEvent.RemoveListener(OnLabLightsTurnedOff);
+            _labLightSystem.LightsOnEvent.RemoveListener(OnLabLightsTurnedOn);
+        }
+
         foreach (PostStudent student in _studentList)
         {
             if (student == null) continue;

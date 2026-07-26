@@ -94,7 +94,9 @@ public class StagePrepareHUDTransition : MonoBehaviour
 
     private void ApplyCurrentStageStateImmediate()
     {
-        if (_stageController.IsPreparing)
+        // Tutorial runtime skips the preparation phase. Use its serialized runtime
+        // configuration directly so this remains correct regardless of Start order.
+        if (!_stageController.IsTutorialRuntime && _stageController.IsPreparing)
             ApplyPreparingImmediate();
         else
             ApplyActiveStageImmediate();

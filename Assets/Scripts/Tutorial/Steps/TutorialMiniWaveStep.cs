@@ -9,7 +9,6 @@ public class TutorialMiniWaveStep : TutorialStepBase
     {
         _failed = false;
         Context.hud.HideMiniWaveFailure();
-        Context.hud.ShowMiniWaveHud(true);
         Context.facade.SetPlayerDeathAllowed(true);
         Context.actors.SetAllBoostBlocked(false);
 
@@ -24,8 +23,6 @@ public class TutorialMiniWaveStep : TutorialStepBase
         Context.facade.StageFinished += OnStageFinished;
         return true;
     }
-
-    protected override void OnTick() => Context.hud.RenderMiniWave(Context.facade);
 
     private void OnStageFinished(StageFinishResult result)
     {
@@ -88,7 +85,6 @@ public class TutorialMiniWaveStep : TutorialStepBase
     {
         Context.facade.StageFinished -= OnStageFinished;
         Context.hud.HideMiniWaveFailure();
-        Context.hud.ShowMiniWaveHud(false);
         Context.facade.StopAllStageSimulation();
         Context.actors.StopAllActors();
         Context.actors.ClearMiniWaveComputerSeats();
@@ -108,7 +104,6 @@ public class TutorialMiniWaveStep : TutorialStepBase
             allowChaosDecay = true,
             evaluateEscapeFailure = true,
             allowProfessorTask = true,
-            showFullStageHud = true,
         };
     }
 }

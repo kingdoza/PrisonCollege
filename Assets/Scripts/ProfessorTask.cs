@@ -58,6 +58,13 @@ public class ProfessorTask : MonoBehaviour
     private void CheckMovementInputToStopTask()
     {
         if (!_isTasking) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StopTask(ProfessorTaskStopReason.InteractToggle);
+            return;
+        }
+
         //float h = Input.GetAxis("Horizontal");
         //float v = Input.GetAxis("Vertical");
         //float hRaw = Input.GetAxisRaw("Horizontal");

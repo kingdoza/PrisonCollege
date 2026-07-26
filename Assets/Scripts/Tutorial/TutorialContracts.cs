@@ -113,7 +113,6 @@ public struct TutorialStagePolicy
     public bool allowChaosDecay;
     public bool evaluateEscapeFailure;
     public bool allowProfessorTask;
-    public bool showFullStageHud;
 
     public static TutorialStagePolicy Stopped => default;
 }

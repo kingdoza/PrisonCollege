@@ -12,7 +12,6 @@ public sealed class TutorialMiniWavePreparationStep : TutorialStepBase
     {
         _checkpointCaptured = false;
         Context.hud.HideMiniWaveFailure();
-        Context.hud.ShowMiniWaveHud(true);
         Context.facade.SetPlayerDeathAllowed(false);
         Context.facade.ForceStopProfessorTasks(ProfessorTaskStopReason.StepExit);
         if (!Context.facade.ApplyPolicy(TutorialStagePolicy.Stopped))
@@ -39,16 +38,8 @@ public sealed class TutorialMiniWavePreparationStep : TutorialStepBase
             return false;
 
         Context.hud.SetNumericProgress(0, 1);
-        Context.hud.RenderMiniWave(Context.facade);
         Context.input.AdvancePressed += OnAdvance;
         return true;
-    }
-
-
-
-    protected override void OnTick()
-    {
-        Context.hud.RenderMiniWave(Context.facade);
     }
 
 
@@ -71,7 +62,5 @@ public sealed class TutorialMiniWavePreparationStep : TutorialStepBase
     protected override void OnExit()
     {
         Context.input.AdvancePressed -= OnAdvance;
-        if (!_checkpointCaptured)
-            Context.hud.ShowMiniWaveHud(false);
     }
 }

@@ -22949,7 +22949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61e775684eeddc43895368d1f296d7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlotPackage
-  _titleTmp: {fileID: 862748420}
+  _titleTmp: {fileID: 1065561217}
   _shopSlotEntry:
     parent: {fileID: 0}
     prefab: {fileID: 0}

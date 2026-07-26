@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -35,15 +34,6 @@ public class TutorialHUDPresenter : MonoBehaviour
     [SerializeField, Min(0f)] private float _progressPunchScale = 0.05f;
     [SerializeField, Min(0f)] private float _completionFeedbackDuration = 0.6f;
     [SerializeField, Min(0f)] private float _completionPunchScale = 0.1f;
-
-    [Header("Mini-wave HUD")]
-    [SerializeField] private GameObject _miniWaveHud;
-    [SerializeField] private TextMeshProUGUI _miniWaveTimer;
-    [SerializeField] private TextMeshProUGUI _miniWaveEscapes;
-    [SerializeField] private TextMeshProUGUI _miniWaveChaos;
-    [SerializeField] private TextMeshProUGUI _miniWaveWorking;
-    [SerializeField] private TextMeshProUGUI _miniWaveProject;
-    [SerializeField] private TextMeshProUGUI _miniWaveGates;
 
     [Header("Step 8 result")]
     [SerializeField] private GameObject _miniWaveFailurePanel;
@@ -110,7 +100,6 @@ public class TutorialHUDPresenter : MonoBehaviour
         _mainMenuButton.onClick.AddListener(_mainMenuAction);
         HideMiniWaveFailure();
         ShowCourseSummaryButtons(false);
-        ShowMiniWaveHud(false);
         return true;
     }
 
@@ -512,39 +501,6 @@ public class TutorialHUDPresenter : MonoBehaviour
     public void ShowChaosDecayHighlight(bool show)
     {
         if (_chaosDecayHighlight != null) _chaosDecayHighlight.SetActive(show);
-        StateRevision++;
-    }
-
-
-
-    public void ShowMiniWaveHud(bool show)
-    {
-        if (_miniWaveHud != null) _miniWaveHud.SetActive(show);
-    }
-
-
-
-    public void RenderMiniWave(TutorialStageFacade facade)
-    {
-        if (facade == null) return;
-        if (_miniWaveTimer != null) _miniWaveTimer.text = facade.TimerRemaining.ToString("F0");
-        if (_miniWaveEscapes != null) _miniWaveEscapes.text = $"{facade.EscapeCount} / {facade.EscapeFailureThreshold}";
-        if (_miniWaveChaos != null) _miniWaveChaos.text = $"{facade.Chaos:F0} ({facade.ChaosRate:+0;-0;--}/s)";
-        if (_miniWaveWorking != null) _miniWaveWorking.text = facade.WorkingStudentCount.ToString();
-        if (_miniWaveProject != null) _miniWaveProject.text = $"{facade.ProjectProgress * 100f:F0}%";
-        if (_miniWaveGates != null)
-        {
-            StringBuilder builder = new();
-            for (int i = 0; i < facade.ExitGates.Count; i++)
-            {
-                ExitGate gate = facade.ExitGates[i];
-                if (i > 0) builder.AppendLine();
-                builder.Append($"{i + 1}: ");
-                builder.Append(gate.IsBarricadePlaced ? "설치" : "파괴");
-                builder.Append($" {gate.HealthRatio * 100f:F0}%");
-            }
-            _miniWaveGates.text = builder.ToString();
-        }
         StateRevision++;
     }
 
