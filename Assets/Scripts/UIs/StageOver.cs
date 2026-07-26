@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class StageOver : MonoBehaviour
 {
@@ -15,6 +16,18 @@ public class StageOver : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _stageTitleTmp;
     [SerializeField] private TextMeshProUGUI _detailTmp;
 
+    [Header("Stage Result Color")]
+    [Tooltip("Optional. If unassigned, stage result color changes are skipped.")]
+    [SerializeField] private Image _resultColorTarget;
+    [SerializeField] private Color _successColor = new Color(0.47f, 0.91f, 0.57f, 1f);
+    [SerializeField] private Color _failureColor = new Color(1f, 0.41f, 0.41f, 1f);
+
+    [Header("Result Panel Unfold")]
+    [Tooltip("Optional. If unassigned, the stage result panel is shown immediately.")]
+    [SerializeField] private ResultPanelUnfoldAnimator _stageEndAnimator;
+    [Tooltip("Optional. If unassigned, the wave result panel is shown immediately.")]
+    [SerializeField] private ResultPanelUnfoldAnimator _waveEndAnimator;
+
 
 
     private void Awake()
@@ -28,17 +41,31 @@ public class StageOver : MonoBehaviour
         _waveEndCanvas.alpha = 0f;
         _waveEndCanvas.interactable = false;
         _waveEndCanvas.blocksRaycasts = false;
+
+        _stageEndAnimator?.Initialize();
+        _waveEndAnimator?.Initialize();
     }
 
 
 
     public void ShowStageOverPanel(bool isSuccess)
     {
+        ApplyResultColor(isSuccess);
         _stageTitleTmp.text = isSuccess ? "<color=green>감금 성공!</color>" : "<color=red>감금 실패!</color>";
         _detailTmp.text = isSuccess ? "대학원생들의 자유 박탈에 성공하였습니다." : "대학원생들에게 자유를 허락하고 말았습니다.";
-        _stageEndCanvas.alpha = 1f;
-        _stageEndCanvas.interactable = true;
-        _stageEndCanvas.blocksRaycasts = true;
+        ShowResultCanvas(_stageEndCanvas, _stageEndAnimator);
+    }
+
+
+
+    private void ApplyResultColor(bool isSuccess)
+    {
+        if (_resultColorTarget == null)
+            return;
+
+        Color resultColor = isSuccess ? _successColor : _failureColor;
+        resultColor.a = _resultColorTarget.color.a;
+        _resultColorTarget.color = resultColor;
     }
 
 
@@ -47,12 +74,24 @@ public class StageOver : MonoBehaviour
     {
         _waveTitleTmp.text = $"웨이브 {WaveSystem.Instance.CurrentWave} 완료";
         _waveDetailTmp.text = $"소득: ${moneyEarned}";
-        _waveEndCanvas.alpha = 1;
-        _waveEndCanvas.interactable = true;
-        _waveEndCanvas.blocksRaycasts = true;
         bool hasToGoArena = WaveSystem.Instance.IsCurrentWaveEndWithArena;
         _arenaBtnObj.SetActive(hasToGoArena);
         _storeBtnObj.SetActive(!hasToGoArena);
+        ShowResultCanvas(_waveEndCanvas, _waveEndAnimator);
+    }
+
+
+
+    private static void ShowResultCanvas(
+        CanvasGroup canvasGroup,
+        ResultPanelUnfoldAnimator animator)
+    {
+        if (animator != null && animator.Play(canvasGroup))
+            return;
+
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
     }
 
 
