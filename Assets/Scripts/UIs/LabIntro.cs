@@ -42,7 +42,7 @@ public class LabIntro : MonoBehaviour
         _membersBtnTmp.SetAllDirty();
 
         _researchBtnTmp.color = _originBtnTmpColor;
-        _researchBtnTmp.font = _boldFontAsset;
+        _researchBtnTmp.font = _originalBtnTmpFontAsset;
         _researchBtnTmp.SetAllDirty();
 
         _bannerTmp.text = "Members\r\n<size=80%>Students</size>";
@@ -60,7 +60,7 @@ public class LabIntro : MonoBehaviour
         _researchBtnTmp.SetAllDirty();
 
         _membersBtnTmp.color = _originBtnTmpColor;
-        _membersBtnTmp.font = _boldFontAsset;
+        _membersBtnTmp.font = _originalBtnTmpFontAsset;
         _membersBtnTmp.SetAllDirty();
 
         _bannerTmp.text = "Archive\r\n<size=80%>Video Asset</size>";
