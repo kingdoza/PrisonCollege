@@ -4990,7 +4990,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 0.3137255}
+  m_Color: {r: 0, g: 1, b: 0, a: 0.3137255}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -8776,27 +8776,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 124.75
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 202.125
       objectReference: {fileID: 0}
     - target: {fileID: 3616889069954552498, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 3920392470360127480, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_IsActive
@@ -8992,27 +8992,27 @@ PrefabInstance:
       objectReference: {fileID: 1271825522}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 124.75
       objectReference: {fileID: 0}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 62.375
       objectReference: {fileID: 0}
     - target: {fileID: 7204690111483138611, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 7216367593452446756, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
       propertyPath: m_AnchorMax.y
@@ -38437,6 +38437,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DirectionGizmo
   arrowLength: 0.5
   gizmoColor: {r: 0, g: 0, b: 1, a: 1}
+--- !u!114 &1585671884 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6934487591789896463, guid: 5145e9c017f3d5240b5fe980a2c498f1, type: 3}
+  m_PrefabInstance: {fileID: 528388646}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e234897906e31429c1ede3d1809761, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageHUDPresenter
 --- !u!1 &1601297083
 GameObject:
   m_ObjectHideFlags: 0
@@ -52233,6 +52244,7 @@ MonoBehaviour:
   _actorDirector: {fileID: 1428147719}
   _checkpointService: {fileID: 104469986}
   _hud: {fileID: 267457547}
+  _stageHUDPresenter: {fileID: 1585671884}
   _highlighter: {fileID: 559830289}
   _input: {fileID: 126463168}
   _playerInputGate: {fileID: 26055358}

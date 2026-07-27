@@ -13,6 +13,7 @@ public class TutorialDirector : MonoBehaviour
     [SerializeField] private TutorialActorDirector _actorDirector;
     [SerializeField] private TutorialCheckpointService _checkpointService;
     [SerializeField] private TutorialHUDPresenter _hud;
+    [SerializeField] private StageHUDPresenter _stageHUDPresenter;
     [SerializeField] private TutorialHighlighter _highlighter;
     [SerializeField] private TutorialInput _input;
     [SerializeField] private TutorialPlayerInputGate _playerInputGate;
@@ -57,6 +58,7 @@ public class TutorialDirector : MonoBehaviour
             || _actorDirector == null || !_actorDirector.IsInitialized
             || _checkpointService == null
             || _hud == null
+            || _stageHUDPresenter == null
             || _highlighter == null
             || _input == null
             || _playerInputGate == null
@@ -366,15 +368,48 @@ public class TutorialDirector : MonoBehaviour
     private bool EnterIndex(int index)
     {
         if (index < 0 || index >= _order.Length) return false;
+        TutorialStepId stepId = _order[index];
+        if (!_stageHUDPresenter.ApplyTutorialTopHUDVisibility(
+            GetTopHUDVisibility(stepId)))
+        {
+            Debug.LogError($"{stepId} 단계의 상단 HUD 표시 정책 적용에 실패했습니다.", this);
+            return false;
+        }
+
         _currentIndex = index;
-        _currentStep = _stepMap[_order[index]];
+        _currentStep = _stepMap[stepId];
         if (!_currentStep.EnterStep())
         {
-            Debug.LogError($"{_order[index]} 단계 진입에 실패해 튜토리얼을 중단합니다.", this);
+            _stageHUDPresenter.ApplyTutorialTopHUDVisibility(StageTopHUDVisibility.None);
+            Debug.LogError($"{stepId} 단계 진입에 실패해 튜토리얼을 중단합니다.", this);
             _currentStep = null;
             return false;
         }
         return true;
+    }
+
+
+
+    private static StageTopHUDVisibility GetTopHUDVisibility(TutorialStepId stepId)
+    {
+        switch (stepId)
+        {
+            case TutorialStepId.InnocentStudent:
+            case TutorialStepId.ChaosDecay:
+                return StageTopHUDVisibility.Chaos;
+
+            case TutorialStepId.StudentWork:
+            case TutorialStepId.ProfessorWork:
+                return StageTopHUDVisibility.Project;
+
+            case TutorialStepId.MiniWavePreparation:
+            case TutorialStepId.MiniWave:
+            case TutorialStepId.CourseSummary:
+                return StageTopHUDVisibility.All;
+
+            default:
+                return StageTopHUDVisibility.None;
+        }
     }
 
 

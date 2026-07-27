@@ -62,7 +62,7 @@ MonoBehaviour:
   _remainingVisual: {fileID: 1425518616410692364}
   _failedVisual: {fileID: 4282445310644480801}
   _failureShake:
-    _target: {fileID: 6355180576706916362}
+    _target: {fileID: 5902014512457084613}
     _duration: 0.25
     _strength: 20
     _vibrato: 24

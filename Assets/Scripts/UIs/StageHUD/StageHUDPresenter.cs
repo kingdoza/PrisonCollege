@@ -1,5 +1,15 @@
 using UnityEngine;
 
+[System.Flags]
+public enum StageTopHUDVisibility
+{
+    None = 0,
+    Chaos = 1 << 0,
+    Center = 1 << 1,
+    Project = 1 << 2,
+    All = Chaos | Center | Project,
+}
+
 public class StageHUDPresenter : MonoBehaviour
 {
     [Header("Read-only runtime sources")]
@@ -15,8 +25,17 @@ public class StageHUDPresenter : MonoBehaviour
     [SerializeField] private StageStaminaHUDView _staminaView;
     [SerializeField] private StageWeaponHUDView _weaponView;
 
+    [Header("Top HUD visibility")]
+    [SerializeField] private CanvasGroup _chaosPanelCanvasGroup;
+    [SerializeField] private CanvasGroup _centerPanelCanvasGroup;
+    [SerializeField] private CanvasGroup _projectPanelCanvasGroup;
+    [Tooltip("튜토리얼에서 현재 단계에 필요하지 않은 상단 패널의 Alpha입니다. 정규 스테이지에는 적용되지 않습니다.")]
+    [SerializeField, Range(0f, 1f)] private float _tutorialInactivePanelAlpha = 0.2f;
+
     private bool _started;
     private bool _initialized;
+    private bool _hasTutorialVisibility;
+    private StageTopHUDVisibility _tutorialVisibility = StageTopHUDVisibility.None;
 
     private void Start()
     {
@@ -71,19 +90,73 @@ public class StageHUDPresenter : MonoBehaviour
         }
 
         _initialized = true;
+        if (_stageController.IsTutorialRuntime)
+        {
+            ApplyRuntimeTopHUDVisibility();
+        }
+    }
+
+    public bool ApplyTutorialTopHUDVisibility(StageTopHUDVisibility visibility)
+    {
+        if (_stageController == null || !_stageController.IsTutorialRuntime)
+        {
+            Debug.LogError(
+                "튜토리얼 상단 HUD 표시 정책은 튜토리얼 runtime에서만 적용할 수 있습니다.",
+                this);
+            return false;
+        }
+
+        _tutorialVisibility = visibility & StageTopHUDVisibility.All;
+        _hasTutorialVisibility = true;
+        ApplyTopHUDVisibility(_tutorialVisibility, _tutorialInactivePanelAlpha);
+        return true;
     }
 
     private bool ValidateReferences()
     {
-        return _stageController != null
-            && _professor != null
-            && _weaponController != null
-            && _timerView != null
-            && _escapeView != null
-            && _projectView != null
-            && _chaosView != null
-            && _staminaView != null
-            && _weaponView != null;
+        if (_stageController == null
+            || _professor == null
+            || _weaponController == null
+            || _timerView == null
+            || _escapeView == null
+            || _projectView == null
+            || _chaosView == null
+            || _staminaView == null
+            || _weaponView == null)
+        {
+            return false;
+        }
+
+        return !_stageController.IsTutorialRuntime
+            || (_chaosPanelCanvasGroup != null
+                && _centerPanelCanvasGroup != null
+                && _projectPanelCanvasGroup != null);
+    }
+
+    private void ApplyRuntimeTopHUDVisibility()
+    {
+        if (!_stageController.IsTutorialRuntime)
+        {
+            return;
+        }
+
+        StageTopHUDVisibility visibility = _hasTutorialVisibility
+            ? _tutorialVisibility
+            : StageTopHUDVisibility.None;
+        ApplyTopHUDVisibility(visibility, _tutorialInactivePanelAlpha);
+    }
+
+    private void ApplyTopHUDVisibility(
+        StageTopHUDVisibility visibility,
+        float inactiveAlpha)
+    {
+        float hiddenAlpha = Mathf.Clamp01(inactiveAlpha);
+        _chaosPanelCanvasGroup.alpha =
+            (visibility & StageTopHUDVisibility.Chaos) != 0 ? 1f : hiddenAlpha;
+        _centerPanelCanvasGroup.alpha =
+            (visibility & StageTopHUDVisibility.Center) != 0 ? 1f : hiddenAlpha;
+        _projectPanelCanvasGroup.alpha =
+            (visibility & StageTopHUDVisibility.Project) != 0 ? 1f : hiddenAlpha;
     }
 
     private void Shutdown()

@@ -35,14 +35,22 @@ public class SoundBehavior : MonoBehaviour
 
     public void PlayGoodSong()
     {
-        _soundEmitterOwner.Play3DSound(_goodSongSD, _headBone, false);
+        _soundEmitterOwner.Play3DSound(
+            _goodSongSD,
+            _headBone,
+            false,
+            isLongDistance: true);
     }
 
 
 
     public void PlayBadSong()
     {
-        _soundEmitterOwner.Play3DSound(_badSongSD, _headBone, false);
+        _soundEmitterOwner.Play3DSound(
+            _badSongSD,
+            _headBone,
+            false,
+            isLongDistance: true);
     }
 
 

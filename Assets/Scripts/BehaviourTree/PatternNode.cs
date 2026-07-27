@@ -1416,6 +1416,8 @@ public class TacklePattern : PatternNode
 
 public class SetRandomSpeedPattern : PatternNode
 {
+    private const float MaxChaos = 200f;
+
     public SetRandomSpeedPattern()
     {
         _patternRoot = new RandomSelector(
@@ -1462,18 +1464,29 @@ public class SetRandomSpeedPattern : PatternNode
                 () => 3,
                 () => 3,
 
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
-                () => StageController.Instance.GetChaosEffectedWeight(2, 5),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
+                () => GetChaosEffectedMoveSpeedWeight(2, 6),
 
-                () => StageController.Instance.GetChaosEffectedWeight(1, 50),
-                () => StageController.Instance.GetChaosEffectedWeight(1, 50),
-                () => StageController.Instance.GetChaosEffectedWeight(1, 50),
+                () => GetChaosEffectedMoveSpeedWeight(1, 204),
+                () => GetChaosEffectedMoveSpeedWeight(1, 204),
+                () => GetChaosEffectedMoveSpeedWeight(1, 204),
             }
         );
+    }
+
+
+
+    private static float GetChaosEffectedMoveSpeedWeight(
+        float originWeight,
+        float maxFactor)
+    {
+        float chaosRatio = Mathf.Clamp01(StageController.Instance.Chaos / MaxChaos);
+        float moveSpeedProgress = chaosRatio * chaosRatio * chaosRatio;
+        return originWeight * Mathf.Lerp(1f, maxFactor, moveSpeedProgress);
     }
 }
 

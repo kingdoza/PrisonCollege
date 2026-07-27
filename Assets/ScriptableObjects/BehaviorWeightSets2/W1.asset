@@ -46,4 +46,4 @@ MonoBehaviour:
   - _behaviorType: 65536
     _chance: 6
   - _behaviorType: 131072
-    _chance: 0
+    _chance: 50
