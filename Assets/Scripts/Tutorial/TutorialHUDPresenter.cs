@@ -37,11 +37,15 @@ public class TutorialHUDPresenter : MonoBehaviour
 
     [Header("Step 8 result")]
     [SerializeField] private GameObject _miniWaveFailurePanel;
+    [SerializeField] private CanvasGroup _miniWaveFailureCanvasGroup;
+    [SerializeField] private ResultPanelUnfoldAnimator _miniWaveFailureAnimator;
     [SerializeField] private Button _restartMiniWaveButton;
     [SerializeField] private Button _skipMiniWaveButton;
 
     [Header("Course summary")]
     [SerializeField] private GameObject _courseSummaryButtons;
+    [SerializeField] private CanvasGroup _courseSummaryCanvasGroup;
+    [SerializeField] private ResultPanelUnfoldAnimator _courseSummaryAnimator;
     [SerializeField] private Button _reenrollButton;
     [SerializeField] private Button _mainMenuButton;
 
@@ -80,15 +84,22 @@ public class TutorialHUDPresenter : MonoBehaviour
         Action reenroll,
         Action mainMenu)
     {
-        if (_restartMiniWaveButton == null
+        if (_miniWaveFailurePanel == null
+            || _miniWaveFailureCanvasGroup == null
+            || _miniWaveFailureAnimator == null
+            || _restartMiniWaveButton == null
             || _skipMiniWaveButton == null
+            || _courseSummaryButtons == null
+            || _courseSummaryCanvasGroup == null
+            || _courseSummaryAnimator == null
             || _reenrollButton == null
             || _mainMenuButton == null)
         {
-            Debug.LogError("TutorialHUDPresenter 결과/요약 버튼 참조가 누락됐습니다.", this);
+            Debug.LogError("TutorialHUDPresenter 결과 패널, CanvasGroup, Animator 또는 버튼 참조가 누락됐습니다.", this);
             return false;
         }
         if (!InitializeStepPanelTransition()) return false;
+        if (!InitializeResultPanels()) return false;
 
         _restartMiniWaveAction = () => restartMiniWave?.Invoke();
         _skipMiniWaveAction = () => skipMiniWave?.Invoke();
@@ -508,7 +519,10 @@ public class TutorialHUDPresenter : MonoBehaviour
 
     public void ShowMiniWaveFailure()
     {
-        if (_miniWaveFailurePanel != null) _miniWaveFailurePanel.SetActive(true);
+        ShowResultPanel(
+            _miniWaveFailurePanel,
+            _miniWaveFailureCanvasGroup,
+            _miniWaveFailureAnimator);
         StateRevision++;
     }
 
@@ -516,7 +530,7 @@ public class TutorialHUDPresenter : MonoBehaviour
 
     public void HideMiniWaveFailure()
     {
-        if (_miniWaveFailurePanel != null) _miniWaveFailurePanel.SetActive(false);
+        HideResultPanel(_miniWaveFailureCanvasGroup, _miniWaveFailureAnimator);
         StateRevision++;
     }
 
@@ -524,7 +538,88 @@ public class TutorialHUDPresenter : MonoBehaviour
 
     public void ShowCourseSummaryButtons(bool show)
     {
-        if (_courseSummaryButtons != null) _courseSummaryButtons.SetActive(show);
+        if (show)
+        {
+            ShowResultPanel(
+                _courseSummaryButtons,
+                _courseSummaryCanvasGroup,
+                _courseSummaryAnimator);
+        }
+        else
+        {
+            HideResultPanel(_courseSummaryCanvasGroup, _courseSummaryAnimator);
+        }
+    }
+
+
+
+    private bool InitializeResultPanels()
+    {
+        return InitializeResultPanel(
+                _miniWaveFailurePanel,
+                _miniWaveFailureCanvasGroup,
+                _miniWaveFailureAnimator,
+                "미니웨이브 실패")
+            && InitializeResultPanel(
+                _courseSummaryButtons,
+                _courseSummaryCanvasGroup,
+                _courseSummaryAnimator,
+                "미니웨이브 성공");
+    }
+
+
+
+    private bool InitializeResultPanel(
+        GameObject panel,
+        CanvasGroup canvasGroup,
+        ResultPanelUnfoldAnimator animator,
+        string panelName)
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+        panel.SetActive(true);
+
+        if (animator.Initialize())
+            return animator.Hide(canvasGroup);
+
+        Debug.LogError($"TutorialHUDPresenter의 {panelName} 결과 패널 펼치기 초기화에 실패했습니다.", this);
+        return false;
+    }
+
+
+
+    private static void ShowResultPanel(
+        GameObject panel,
+        CanvasGroup canvasGroup,
+        ResultPanelUnfoldAnimator animator)
+    {
+        if (panel == null || canvasGroup == null)
+            return;
+
+        panel.SetActive(true);
+        if (animator != null && animator.Play(canvasGroup))
+            return;
+
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+    }
+
+
+
+    private static void HideResultPanel(
+        CanvasGroup canvasGroup,
+        ResultPanelUnfoldAnimator animator)
+    {
+        if (canvasGroup == null)
+            return;
+        if (animator != null && animator.Hide(canvasGroup))
+            return;
+
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
 

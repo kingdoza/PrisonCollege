@@ -119,6 +119,26 @@ public sealed class ResultPanelUnfoldAnimator : MonoBehaviour
         return true;
     }
 
+    public bool Hide(CanvasGroup panelCanvasGroup)
+    {
+        if (panelCanvasGroup == null)
+        {
+            Debug.LogError("ResultPanelUnfoldAnimator에서 숨길 Panel CanvasGroup이 없습니다.", this);
+            return false;
+        }
+
+        if (!_initialized && !Initialize())
+            return false;
+
+        KillTween();
+        SetPanelHeight(_expandedHeight);
+        SetContentVisible(true);
+        panelCanvasGroup.alpha = 0f;
+        panelCanvasGroup.interactable = false;
+        panelCanvasGroup.blocksRaycasts = false;
+        return true;
+    }
+
     private void OnDisable()
     {
         KillTween();
