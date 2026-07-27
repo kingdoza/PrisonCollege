@@ -91,7 +91,13 @@ public class PlayerInteraction : MonoBehaviour
         // SphereCast: 점이 아닌 구체 형태로 레이를 쏨
         // 인자: 시작점, 반지름, 방향, 결과, 거리, 레이어마스크
         //if (Physics.SphereCast(origin, _interactRadius, direction, out RaycastHit hit, _interactRange, _interactableLayer))
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, _interactRange, _interactableLayer))
+        if (Physics.Raycast(
+            origin,
+            direction,
+            out RaycastHit hit,
+            _interactRange,
+            _interactableLayer,
+            QueryTriggerInteraction.Ignore))
         {
             IPlayerInteractable interactable = hit.collider.GetComponentInParent<IPlayerInteractable>();
 
