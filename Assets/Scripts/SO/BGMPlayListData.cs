@@ -12,6 +12,8 @@ public class BGMPlaylistData : ScriptableObject
     private List<int> _shuffleIndices = new List<int>();
     private int _currentIndex = -1;
 
+    public bool IsSingleTrack => bgmList != null && bgmList.Length == 1;
+
     /// <summary>
     /// 외부에서 강제로 셔플 상태를 초기화하고 리스트를 다시 섞습니다.
     /// </summary>

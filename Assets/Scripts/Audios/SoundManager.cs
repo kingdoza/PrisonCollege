@@ -233,6 +233,13 @@ public static class SoundUtils
     {
         if (isShuffle)
             bGMPlaylistData.ResetShuffle();
-        return SoundManager.Instance.PlayBGM(bGMPlaylistData.GetNextShuffleClip(out float volume, out string title), volume * volumeMultiplier, true, false, true);
+
+        AudioClip clip = bGMPlaylistData.GetNextShuffleClip(out float volume, out string title);
+        return SoundManager.Instance.PlayBGM(
+            clip,
+            volume * volumeMultiplier,
+            true,
+            bGMPlaylistData.IsSingleTrack,
+            true);
     }
 }

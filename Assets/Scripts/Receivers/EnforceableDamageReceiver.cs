@@ -12,8 +12,15 @@ public class EnforceableDamageReceiver : DamageReceiver
     {
         bool hasToEnforce = false;
         WaveSystem.Instance?.TryRollEnforcement(out hasToEnforce);
-        _health = hasToEnforce ? _enforcedHealth : _defaultHealth;
+        SetEnforced(hasToEnforce);
+    }
+
+
+
+    public void SetEnforced(bool isEnforced)
+    {
+        _health = isEnforced ? _enforcedHealth : _defaultHealth;
         _health.Initialize();
-        _enforceObject.SetActive(hasToEnforce);
+        _enforceObject.SetActive(isEnforced);
     }
 }

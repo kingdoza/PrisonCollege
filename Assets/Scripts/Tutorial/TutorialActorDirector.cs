@@ -130,6 +130,15 @@ public class TutorialActorDirector : MonoBehaviour
                 Debug.LogError($"StudentDB index {i} prefab에 PostStudent가 없습니다.", entries[i].prefab);
                 return false;
             }
+
+            EnforceableDamageReceiver damageReceiver = spawned.GetComponent<EnforceableDamageReceiver>();
+            if (damageReceiver == null)
+            {
+                Debug.LogError($"StudentDB index {i} prefab에 EnforceableDamageReceiver가 없습니다.", entries[i].prefab);
+                return false;
+            }
+            damageReceiver.SetEnforced(false);
+
             if (i == 0)
             {
                 _foodCatalogSource = spawned.GetComponent<PlateAttacher>();
