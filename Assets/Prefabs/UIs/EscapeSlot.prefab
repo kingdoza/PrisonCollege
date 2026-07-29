@@ -64,7 +64,7 @@ MonoBehaviour:
   _failureShake:
     _target: {fileID: 5902014512457084613}
     _duration: 0.25
-    _strength: 20
+    _strength: 40
     _vibrato: 24
     _randomness: 90
     _fadeOut: 1

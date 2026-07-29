@@ -5134,8 +5134,8 @@ MonoBehaviour:
     isEndWithArena: 0
   - behaviorWeightSet: {fileID: 11400000, guid: f6d34312ffb02c7428b79212315cb02b, type: 2}
     dayState: 0
-    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9: \uD63C\uB780
-      \uC720\uBC1C\n\uD63C\uB780 \uC720\uBC1C(\uC2F8\uC6B0\uAE30, \uC800\uC9C8\uB178\uB798)"
+    explanation: "\uB300\uD559\uC6D0\uC0DD \uCD94\uAC00 \uD589\uB3D9:\n\uD63C\uB780
+      \uC720\uBC1C(\uC2F8\uC6B0\uAE30, \uC800\uC9C8\uB178\uB798)"
     enforceProb: 0
     isEndWithArena: 1
   - behaviorWeightSet: {fileID: 11400000, guid: 934718cbb17fb854f8f9c98887cdf7cc, type: 2}

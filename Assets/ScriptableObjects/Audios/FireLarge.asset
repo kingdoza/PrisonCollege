@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundData
   soundInfos:
   - clip: {fileID: 8300000, guid: 447e97f44e7d0fd4eb6ddec82c319992, type: 3}
-    volumeMultiplier: 2
-  baseVolume: 2
+    volumeMultiplier: 1.5
+  baseVolume: 1
