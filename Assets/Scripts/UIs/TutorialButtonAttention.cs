@@ -103,9 +103,6 @@ public sealed class TutorialButtonAttention : MonoBehaviour
 
     private IEnumerator AttentionLoop()
     {
-        ApplyFrame(_outerPadding, 0f);
-        yield return WaitUnscaled(_repeatDelay);
-
         while (_attentionActive)
         {
             ApplyFrame(_outerPadding, 0f);
