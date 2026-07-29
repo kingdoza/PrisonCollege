@@ -145,6 +145,8 @@ public class FirstPersonController : MonoBehaviour
     public bool IsSprinting => isSprinting;
 
     private AttributeModifier moveSpeedMod;
+    private Vector3 movementInput;
+    private float movementSpeed;
     public bool IsGrounded => isGrounded;
 
 
@@ -345,7 +347,7 @@ public class FirstPersonController : MonoBehaviour
             }
         }
 
-        Movement();
+        UpdateMovementState();
 
         #endregion
 
@@ -472,65 +474,87 @@ public class FirstPersonController : MonoBehaviour
     {
         if (Time.timeScale == 0) return;
         #region Movement
-        //Movement();
+        ApplyMovementVelocity();
         #endregion 
     }
 
 
 
-    private void Movement()
+    private void UpdateMovementState()
     {
-        if (playerCanMove)
+        if (!playerCanMove)
         {
-            // 1. 입력 방향 계산
-            Vector3 inputDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-
-            // 걷기/달리기 상태 확인
-            isWalking = (inputDir.x != 0 || inputDir.z != 0) && isGrounded;
-
-            float currentSpeed = walkSpeed;
-
-            // [ADD] 토글 모드일 때 정면 이동이 아니면 달리기 취소 로직
-            if (!holdToSprint && sprintToggleState)
-            {
-                // 앞으로 가는 키(Vertical > 0)를 누르지 않고 있다면 토글 해제
-                if (Input.GetAxisRaw("Vertical") <= 0f)
-                {
-                    sprintToggleState = false;
-                }
-            }
-
-            // [ADD] 달리기 입력 확인 (홀드 방식 vs 토글 방식)
-            // 위에서 sprintToggleState가 꺼졌다면 sprintInput도 false가 됨
-            bool sprintInput = holdToSprint ? Input.GetKey(sprintKey) : sprintToggleState;
-
-            // 스프린트 조건 체크
-            // (Vertical > 0f 조건은 위에서 이미 체크했지만, 안전을 위해 유지)
-            if (enableSprint && sprintInput && !stamina.IsDepleted && !isSprintCooldown && Input.GetAxisRaw("Vertical") > 0f)
-            {
-                currentSpeed = sprintSpeed;
-                isSprinting = true;
-
-                if (isCrouched) Crouch();
-            }
-            else
-            {
-                isSprinting = false;
-            }
-
-            // 2. 목표 속도 및 이동량 계산
-            Vector3 moveDir = transform.TransformDirection(inputDir);
-
-            // 최종 이동 벡터 (속도 * 시간)
-            Vector3 movement = moveDir * currentSpeed * Time.deltaTime * moveSpeedMod.GetFinalValue(1);
-
-            float floodFillRatio = FireSuppressionSystem.Instance != null ? FireSuppressionSystem.Instance.FloodFillRatio : 0f;
-            float speedRatio = Mathf.Lerp(1, 0.3f, floodFillRatio);
-            movement *= speedRatio;
-
-            // 3. MovePosition으로 이동
-            rb.MovePosition(rb.position + movement);
+            movementInput = Vector3.zero;
+            movementSpeed = 0f;
+            isWalking = false;
+            isSprinting = false;
+            return;
         }
+
+        movementInput = Vector3.ClampMagnitude(
+            new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")),
+            1f);
+
+        isWalking = movementInput.sqrMagnitude > 0.0001f && isGrounded;
+        movementSpeed = walkSpeed;
+
+        // [ADD] 토글 모드일 때 정면 이동이 아니면 달리기 취소 로직
+        if (!holdToSprint && sprintToggleState)
+        {
+            // 앞으로 가는 키(Vertical > 0)를 누르지 않고 있다면 토글 해제
+            if (Input.GetAxisRaw("Vertical") <= 0f)
+            {
+                sprintToggleState = false;
+            }
+        }
+
+        // [ADD] 달리기 입력 확인 (홀드 방식 vs 토글 방식)
+        // 위에서 sprintToggleState가 꺼졌다면 sprintInput도 false가 됨
+        bool sprintInput = holdToSprint ? Input.GetKey(sprintKey) : sprintToggleState;
+
+        // 스프린트 조건 체크
+        // (Vertical > 0f 조건은 위에서 이미 체크했지만, 안전을 위해 유지)
+        if (enableSprint && sprintInput && !stamina.IsDepleted && !isSprintCooldown && Input.GetAxisRaw("Vertical") > 0f)
+        {
+            movementSpeed = sprintSpeed;
+            isSprinting = true;
+
+            if (isCrouched) Crouch();
+        }
+        else
+        {
+            isSprinting = false;
+        }
+    }
+
+
+
+    private void ApplyMovementVelocity()
+    {
+        if (rb == null || rb.isKinematic) return;
+
+        Vector3 targetPlanarVelocity = Vector3.zero;
+        if (playerCanMove && movementInput.sqrMagnitude > 0.0001f)
+        {
+            Vector3 moveDirection = transform.TransformDirection(movementInput);
+            moveDirection.y = 0f;
+
+            float floodFillRatio = FireSuppressionSystem.Instance != null
+                ? FireSuppressionSystem.Instance.FloodFillRatio
+                : 0f;
+            float speedRatio = Mathf.Lerp(1f, 0.3f, floodFillRatio);
+            targetPlanarVelocity =
+                moveDirection
+                * movementSpeed
+                * moveSpeedMod.GetFinalValue(1f)
+                * speedRatio;
+        }
+
+        Vector3 currentVelocity = rb.linearVelocity;
+        rb.linearVelocity = new Vector3(
+            targetPlanarVelocity.x,
+            currentVelocity.y,
+            targetPlanarVelocity.z);
     }
 
 
