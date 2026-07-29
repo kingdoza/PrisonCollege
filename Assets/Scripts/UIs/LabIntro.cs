@@ -27,7 +27,7 @@ public class LabIntro : MonoBehaviour
 
     private void Start()
     {
-        Research_Btn();
+        Members_Btn();
     }
 
 

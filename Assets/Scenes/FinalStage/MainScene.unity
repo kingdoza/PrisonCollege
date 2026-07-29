@@ -14614,9 +14614,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1435497661}
-  - {fileID: 1830499501}
   - {fileID: 2049907177}
+  - {fileID: 1830499501}
+  - {fileID: 1435497661}
   m_Father: {fileID: 358809446}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -31082,7 +31082,7 @@ MonoBehaviour:
     _visualCanvasGroup: {fileID: 672785222}
   - _visualRoot: {fileID: 2111244069}
     _visualCanvasGroup: {fileID: 2111244070}
-  _startDelay: 0.4
+  _startDelay: 0.65
   _leftOffset: 130
   _initialScale: 0.9
   _duration: 0.4
