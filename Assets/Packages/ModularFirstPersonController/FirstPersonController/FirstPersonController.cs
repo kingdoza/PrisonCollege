@@ -146,6 +146,7 @@ public class FirstPersonController : MonoBehaviour
 
     private AttributeModifier moveSpeedMod;
     private Vector3 movementInput;
+    private Vector3 movementDirection;
     private float movementSpeed;
     public bool IsGrounded => isGrounded;
 
@@ -235,6 +236,7 @@ public class FirstPersonController : MonoBehaviour
         #region Camera
 
         // (Camera Code omitted for brevity, logic remains same)
+        RotateCamera();
 
         #region Camera Zoom
         // (Zoom Code omitted for brevity, logic remains same)
@@ -391,7 +393,6 @@ public class FirstPersonController : MonoBehaviour
             HeadBob();
         }
 
-        RotateCamera();
     }
 
     private void LateUpdate()
@@ -485,6 +486,7 @@ public class FirstPersonController : MonoBehaviour
         if (!playerCanMove)
         {
             movementInput = Vector3.zero;
+            movementDirection = Vector3.zero;
             movementSpeed = 0f;
             isWalking = false;
             isSprinting = false;
@@ -492,8 +494,9 @@ public class FirstPersonController : MonoBehaviour
         }
 
         movementInput = Vector3.ClampMagnitude(
-            new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")),
+            new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical")),
             1f);
+        movementDirection = Quaternion.Euler(0f, currentYaw, 0f) * movementInput;
 
         isWalking = movementInput.sqrMagnitude > 0.0001f && isGrounded;
         movementSpeed = walkSpeed;
@@ -534,17 +537,14 @@ public class FirstPersonController : MonoBehaviour
         if (rb == null || rb.isKinematic) return;
 
         Vector3 targetPlanarVelocity = Vector3.zero;
-        if (playerCanMove && movementInput.sqrMagnitude > 0.0001f)
+        if (playerCanMove && movementDirection.sqrMagnitude > 0.0001f)
         {
-            Vector3 moveDirection = transform.TransformDirection(movementInput);
-            moveDirection.y = 0f;
-
             float floodFillRatio = FireSuppressionSystem.Instance != null
                 ? FireSuppressionSystem.Instance.FloodFillRatio
                 : 0f;
             float speedRatio = Mathf.Lerp(1f, 0.3f, floodFillRatio);
             targetPlanarVelocity =
-                moveDirection
+                movementDirection
                 * movementSpeed
                 * moveSpeedMod.GetFinalValue(1f)
                 * speedRatio;
