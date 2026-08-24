@@ -17480,6 +17480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcea4572cc2fe0b48abe995c9f8edf99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainScreen
+  _enableShowcaseSaveHotkeys: 1
   _stageSelectPanel: {fileID: 1892808082}
   _settingPanel: {fileID: 288169168}
   _membersPanel: {fileID: 51185926}

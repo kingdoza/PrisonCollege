@@ -141,6 +141,14 @@ public class StageSlot : MonoBehaviour, IPointerClickHandler
 
 
 
+    public void RefreshProgressUI()
+    {
+        SetLockUI();
+        SetClearUI();
+    }
+
+
+
     public void Normal_Btn()
     {
         GameManager.Instance.PrepareStage(_stageInfo.number, DifficultyLevel.Normal);

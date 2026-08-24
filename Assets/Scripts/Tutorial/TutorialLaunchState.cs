@@ -40,4 +40,13 @@ public static class TutorialLaunchState
         PlayerPrefs.SetInt(STARTED_ONCE_KEY, 1);
         PlayerPrefs.Save();
     }
+
+
+
+    public static void ResetStartedOnce()
+    {
+        PlayerPrefs.DeleteKey(STARTED_ONCE_KEY);
+        PlayerPrefs.Save();
+        RegisterMainStageLaunchObservation();
+    }
 }

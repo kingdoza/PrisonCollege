@@ -39,6 +39,8 @@ public class GameManager : PersistentSingleton<GameManager>
     private string _previousSceneName;
     private string _currentSceneName;
     private const string TUTORIAL_COMPLETED_KEY = "TutorialCompleted";
+    private const string MAX_CLEAR_STAGE_KEY = "MaxClearStage";
+    private const string STAGE_DIFFICULTY_KEY_PREFIX = "StageDifficulty_";
 
     public bool IsTutorialCompleted => PlayerPrefs.GetInt(TUTORIAL_COMPLETED_KEY, 0) == 1;
 
@@ -236,16 +238,13 @@ public class GameManager : PersistentSingleton<GameManager>
 
     private void LoadStageProgress()
     {
-        int lastClearedStageNum = PlayerPrefs.GetInt("MaxClearStage", 0);
-        int[] stageDifficulties = new int[_stageEntries.Length];
-        for (int i = 0; i < stageDifficulties.Length; i++)
-        {
-            stageDifficulties[i] = PlayerPrefs.GetInt("StageDifficulty_" + (i + 1), 0);
-        }
+        int lastClearedStageNum = PlayerPrefs.GetInt(MAX_CLEAR_STAGE_KEY, 0);
 
         for(int i = 0; i < _stageEntries.Length; ++i)
         {
-            _stageEntries[i].maxClearDifficulty = (DifficultyLevel)stageDifficulties[i];
+            int stageNumber = _stageEntries[i].number;
+            int difficulty = PlayerPrefs.GetInt(GetStageDifficultyKey(stageNumber), 0);
+            _stageEntries[i].maxClearDifficulty = (DifficultyLevel)difficulty;
             _stageEntries[i].isLocked = _stageEntries[i].number > lastClearedStageNum + 1;
         }
     }
@@ -254,10 +253,54 @@ public class GameManager : PersistentSingleton<GameManager>
 
     private void SaveStageProgress(int stageNum, DifficultyLevel difficultyLevel)
     {
-        int maxClearStage = Mathf.Max(stageNum, PlayerPrefs.GetInt("MaxClearStage", 0));
-        PlayerPrefs.SetInt("MaxClearStage", maxClearStage);
-        PlayerPrefs.SetInt("StageDifficulty_" + stageNum, (int)difficultyLevel);
+        int maxClearStage = Mathf.Max(stageNum, PlayerPrefs.GetInt(MAX_CLEAR_STAGE_KEY, 0));
+        PlayerPrefs.SetInt(MAX_CLEAR_STAGE_KEY, maxClearStage);
+        PlayerPrefs.SetInt(GetStageDifficultyKey(stageNum), (int)difficultyLevel);
         PlayerPrefs.Save();
+    }
+
+
+
+    public void ResetStageProgress()
+    {
+        PlayerPrefs.DeleteKey(MAX_CLEAR_STAGE_KEY);
+        for (int i = 0; i < _stageEntries.Length; ++i)
+        {
+            PlayerPrefs.DeleteKey(GetStageDifficultyKey(_stageEntries[i].number));
+        }
+
+        PlayerPrefs.Save();
+        LoadStageProgress();
+    }
+
+
+
+    public void SetAllStagesCleared(DifficultyLevel difficultyLevel)
+    {
+        if (difficultyLevel != DifficultyLevel.Normal && difficultyLevel != DifficultyLevel.Hard)
+        {
+            Debug.LogError("전체 스테이지 클리어 설정에는 Normal 또는 Hard 난이도만 사용할 수 있습니다.", this);
+            return;
+        }
+
+        int maxStageNumber = 0;
+        for (int i = 0; i < _stageEntries.Length; ++i)
+        {
+            int stageNumber = _stageEntries[i].number;
+            maxStageNumber = Mathf.Max(maxStageNumber, stageNumber);
+            PlayerPrefs.SetInt(GetStageDifficultyKey(stageNumber), (int)difficultyLevel);
+        }
+
+        PlayerPrefs.SetInt(MAX_CLEAR_STAGE_KEY, maxStageNumber);
+        PlayerPrefs.Save();
+        LoadStageProgress();
+    }
+
+
+
+    private static string GetStageDifficultyKey(int stageNumber)
+    {
+        return STAGE_DIFFICULTY_KEY_PREFIX + stageNumber;
     }
 
 

@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class MainScreen : MonoBehaviour
 {
+    [Header("Showcase Build")]
+    [Tooltip("활성화하면 메인씬에서 F1~F5 시연용 저장값 단축키를 사용할 수 있습니다.")]
+    [SerializeField] private bool _enableShowcaseSaveHotkeys;
+    [Header("Panels")]
     [SerializeField] private SimplePanel _stageSelectPanel;
     [SerializeField] private SettingPanel _settingPanel;
     [SerializeField] private SimplePanel _membersPanel;
@@ -14,6 +18,7 @@ public class MainScreen : MonoBehaviour
     [SerializeField] private MainMenuButtonEntrancePresenter _buttonEntrancePresenter;
 
     private bool _isIntroFlowRunning;
+    private StageLayout _stageLayout;
 
 
     private void Awake()
@@ -22,6 +27,39 @@ public class MainScreen : MonoBehaviour
         _settingPanel.gameObject.SetActive(true);
         _membersPanel.gameObject.SetActive(true);
         _exitCheckPanel.gameObject.SetActive(true);
+        _stageLayout = _stageSelectPanel.GetComponentInChildren<StageLayout>(true);
+    }
+
+
+
+    private void Update()
+    {
+        if (!_enableShowcaseSaveHotkeys) return;
+
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            TutorialLaunchState.ResetStartedOnce();
+            ActivateTutorialAttention();
+        }
+        else if (Input.GetKeyDown(KeyCode.F2))
+        {
+            IntroPlaybackState.ResetStartedOnce();
+        }
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            GameManager.Instance.ResetStageProgress();
+            _stageLayout?.RefreshProgressUI();
+        }
+        else if (Input.GetKeyDown(KeyCode.F4))
+        {
+            GameManager.Instance.SetAllStagesCleared(DifficultyLevel.Normal);
+            _stageLayout?.RefreshProgressUI();
+        }
+        else if (Input.GetKeyDown(KeyCode.F5))
+        {
+            GameManager.Instance.SetAllStagesCleared(DifficultyLevel.Hard);
+            _stageLayout?.RefreshProgressUI();
+        }
     }
 
 

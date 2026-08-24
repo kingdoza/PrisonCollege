@@ -52,6 +52,19 @@ public class StageLayout : MonoBehaviour
 
 
 
+    public void RefreshProgressUI()
+    {
+        UnselectStage();
+        if (_stageSlots == null) return;
+
+        for (int i = 0; i < _stageSlots.Length; ++i)
+        {
+            _stageSlots[i]?.RefreshProgressUI();
+        }
+    }
+
+
+
     private void OnSlotMouseClicked(StageSlot targetSlot)
     {
         if (targetSlot == _selectedStage)
